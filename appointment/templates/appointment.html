@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Doctor Appointment</title>
+    <!-- Link to Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css">
+    <!-- Custom CSS -->
+    <style>
+        body {
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 50px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+        }
+    </style>
+
+    <style>
+        #search-results-dropdown {
+            position: absolute;
+            z-index: 1;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .result {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .result:hover {
+            background-color: #f5f5f5;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Patient Appointment</h1>
+    <form method="post">{% csrf_token %}
+        <div class="row">
+            <div class="col-lg-6 mb-3">
+                <label for="patientName" class="form-label">Patient Name</label>
+                <input type="text" class="form-control" id="patientName" placeholder="Enter or select a patient name">
+                <input type="hidden" name="patientID" id="patientID">
+                <div id="patient-search-results-dropdown"></div>
+            </div>
+
+            <div class="col-lg-6 mb-3">
+                <label for="doctorName" class="form-label">Doctor's Name</label>
+                <input type="text" class="form-control" id="doctorName" placeholder="Enter or select a doctor's name">
+                <input type="hidden" name="doctorID" id="doctorID">
+                <div id="doctor-search-results-dropdown"></div>
+
+            </div>
+        </div>
+        <!-- Rest of the form remains unchanged -->
+        <div class="row">
+            <div class="col-lg-6 mb-3">
+                <label for="appointmentDate" class="form-label">Appointment Date</label>
+                <input type="date" class="form-control" name="appointmentDate" id="appointmentDate">
+            </div>
+            <div class="col-lg-6 mb-3">
+                <label for="appointmentTime" class="form-label">Appointment Time</label>
+                <input type="time" class="form-control" name="appointmentTime" id="appointmentTime">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-6 mb-3">
+                <label for="bloodPressure" class="form-label">Blood Pressure</label>
+                <input type="text" class="form-control" name="bloodPressure" id="bloodPressure" placeholder="Enter BP (e.g., 120/80)">
+            </div>
+            <div class="col-lg-6 mb-3">
+                <label for="weight" class="form-label">Weight (kg)</label>
+                <input type="number" class="form-control" name="weight" id="weight" placeholder="Enter weight in kilograms">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Schedule Appointment</button>
+    </form>
+</div>
+<!-- Link to Bootstrap JS (Optional) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.min.js"></script>
+<!-- In your HTML template -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+
+<script>
+$(document).ready(function () {
+    // Target the patient name input field and the results dropdown
+    var $patientNameInput = $("#patientName");
+    var $resultsDropdown = $("#patient-search-results-dropdown");
+
+    // Event listener for input changes
+    $patientNameInput.on("input", function () {
+        var term = $patientNameInput.val();
+
+        // Send an AJAX request to your Django view
+        $.ajax({
+            url: '/appointment/patient-search/',  // Update the URL as needed
+            data: {
+                'term': term
+            },
+            dataType: 'json',
+            success: function (data) {
+                // Clear and hide the dropdown
+                $resultsDropdown.empty().hide();
+
+                // Populate the results dropdown with the retrieved data
+                if (data.results.length > 0) {
+                    $.each(data.results, function (index, patient) {
+                        var resultItem = $('<div class="result">' + patient.name + '</div>');
+
+                        // Event listener for result item click
+                        resultItem.on("click", function () {
+                            $patientNameInput.val(patient.name);
+                            $('#patientID').val(patient.id);
+                            $resultsDropdown.empty().hide();
+                        });
+
+                        $resultsDropdown.append(resultItem);
+                    });
+
+                    // Show the dropdown
+                    $resultsDropdown.show();
+                }
+            }
+        });
+    });
+
+    // Event listener to hide the dropdown on a click outside
+    $(document).on("click", function (event) {
+        if (!$patientNameInput.is(event.target) && !$resultsDropdown.is(event.target) && $resultsDropdown.has(event.target).length === 0) {
+            $resultsDropdown.empty().hide();
+        }
+    });
+});
+
+
+
+</script>
+
+<script>
+    $(document).ready(function () {
+    // Target the doctor name input field and the results dropdown
+    var $doctorNameInput = $("#doctorName");
+    var $doctorResultsDropdown = $("#doctor-search-results-dropdown");
+    var $doctorIDField = $("#doctorID");  // Added field to store doctor ID
+
+    // Event listener for input changes
+    $doctorNameInput.on("input", function () {
+        var term = $doctorNameInput.val();
+
+        // Send an AJAX request to your Django view for doctor search
+        $.ajax({
+            url: '/appointment/doctor-search/',  // Update the URL as needed
+            data: {
+                'term': term
+            },
+            dataType: 'json',
+            success: function (data) {
+                // Clear and hide the dropdown
+                $doctorResultsDropdown.empty().hide();
+
+                // Populate the results dropdown with the retrieved data
+                if (data.results.length > 0) {
+                    $.each(data.results, function (index, doctor) {
+                        var resultItem = $('<div class="result">' + doctor.name + '</div>');
+
+                        // Event listener for result item click
+                        resultItem.on("click", function () {
+                            $doctorNameInput.val(doctor.name);
+                            $doctorIDField.val(doctor.id);
+                            $doctorResultsDropdown.empty().hide();
+                        });
+
+                        $doctorResultsDropdown.append(resultItem);
+                    });
+
+                    // Show the dropdown
+                    $doctorResultsDropdown.show();
+                } else {
+                    // Clear the doctor ID field when no results found
+                    $doctorIDField.val('');
+                }
+            }
+        });
+    });
+
+    // Event listener to hide the dropdown on a click outside
+    $(document).on("click", function (event) {
+        if (!$doctorNameInput.is(event.target) && !$doctorResultsDropdown.is(event.target) && $doctorResultsDropdown.has(event.target).length === 0) {
+            $doctorResultsDropdown.empty().hide();
+        }
+    });
+});
+
+
+
+</script>
+
+
+</body>
+</html>
