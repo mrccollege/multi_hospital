@@ -74,8 +74,8 @@ WSGI_APPLICATION = 'multi_hospital_project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'new_hospital',
-        'USER': 'new_hospital_User',
+        'NAME': 'multi_hospital',
+        'USER': '	multi_hospital_user',
         'PASSWORD': 'qwerty123',
         'HOST': 'localhost',
         'PORT': '3306',
