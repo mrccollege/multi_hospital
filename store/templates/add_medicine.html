@@ -1,10 +1,69 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'base_hospital.html' %}
 
-</body>
-</html>
+{% block css %}
+{% endblock css %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h2 class="mb-4">Medicine Registration</h2>
+            <form method="post">{% csrf_token %}
+                <div class="mb-3">
+                    <label for="medicineName" class="form-label">Medicine Name</label>
+                    <input type="text" class="form-control" name="medicineName" id="medicineName"
+                           placeholder="Enter medicine Name"
+                           required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="description" class="form-label">Medicine Description</label>
+                    <textarea class="w-100" name="description" id="description" rows="3" placeholder="Enter description"></textarea>
+                </div>
+
+
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            <label for="price" class="form-label">Price</label>
+                            <input type="number" class="form-control" name="price" id="price" placeholder="Enter price">
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            <label for="quantity" class="form-label">Quantity</label>
+                            <input type="number" class="form-control" name="quantity" id="quantity"
+                                   placeholder="Enter quantity">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            <label for="manufacturer" class="form-label">Manufacturer</label>
+                            <input type="text" class="form-control" name="manufacturer" id="manufacturer"
+                                   placeholder="Enter manufacturer">
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            <label for="expiration_date" class="form-label">Expiration Date</label>
+                            <input type="date" class="form-control" name="expiration_date" id="expiration_date"
+                                   placeholder="Enter expiration_date">
+                        </div>
+                    </div>
+                </div>
+
+
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+
+{% block js %}
+{% endblock js %}

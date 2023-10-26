@@ -1,0 +1,41 @@
+{% extends 'base_hospital.html' %}
+
+{% block css %}
+{% endblock css %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h2 class="mb-4">Mini Medical Store Registration</h2>
+            <form method="post">{% csrf_token %}
+                <div class="mb-3">
+                    <label for="medicalName" class="form-label">Medical Name</label>
+                    <input type="text" class="form-control" name="medicalName" id="medicalName" placeholder="Enter Medical Name"
+                           required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" class="form-control" name="username" id="username" placeholder="Enter username" required>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control" name="email" id="email" placeholder="Enter email" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" name="password" id="password" placeholder="Enter Password" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+
+{% block js %}
+{% endblock js %}

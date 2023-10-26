@@ -9,6 +9,8 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     path('appointment/', include('appointment.urls')),
     path('doctor/', include('doctor.urls')),
+    path('dashboard/', include('dashboard.urls')),
+    path('store/', include('store.urls')),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 if settings.DEBUG:

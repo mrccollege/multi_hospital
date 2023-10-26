@@ -1,6 +1,7 @@
 from django.shortcuts import render
 
 # Create your views here.
+from store.models import MainMedicalStore, MiniMedicalStore
 from .models import CustomUser, HospitalUser, DoctorUser, PatientUser
 
 
@@ -85,3 +86,45 @@ def patient_registration(request):
             return render(request, 'patient_user.html')
 
     return render(request, 'patient_user.html')
+
+
+def main_medical_store_registration(request):
+    if request.method == 'POST':
+        form = request.POST
+        medical_name = form.get('medicalName')
+        username = form.get('username')
+        email = form.get('email')
+        password = form.get('password')
+        user_type = 'MAIN_MEDICAL_STORE'
+        user = CustomUser.objects.create_user(full_name=medical_name,
+                                              username=username,
+                                              email=email,
+                                              password=password,
+                                              user_type=user_type,
+                                              )
+        if user:
+            MainMedicalStore.objects.create(user_id=user.id, hospital_id=1)
+            return render(request, 'main_medical_store_register.html')
+
+    return render(request, 'main_medical_store_register.html')
+
+
+def mini_medical_store_registration(request):
+    if request.method == 'POST':
+        form = request.POSTs
+        medical_name = form.get('medicalName')
+        username = form.get('username')
+        email = form.get('email')
+        password = form.get('password')
+        user_type = 'MINI_MEDICAL_STORE'
+        user = CustomUser.objects.create_user(full_name=medical_name,
+                                              username=username,
+                                              email=email,
+                                              password=password,
+                                              user_type=user_type,
+                                              )
+        if user:
+            MiniMedicalStore.objects.create(user_id=user.id, hospital_id=1)
+            return render(request, 'mini_medical_store_register.html')
+
+    return render(request, 'mini_medical_store_register.html')
