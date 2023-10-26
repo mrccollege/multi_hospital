@@ -25,8 +25,11 @@ def patient_appointment(request):
 
         if appoint:
             return redirect('/appointment/patient-appointment/')
-
-    return render(request, 'appointment.html')
+    doctor = DoctorUser.objects.filter()
+    context = {
+        'doctor': doctor
+    }
+    return render(request, 'appointment.html', context)
 
 
 def patient_search(request):

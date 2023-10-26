@@ -10,8 +10,8 @@ from appointment.models import PatientAppointment
 def doctor_dashboard(request):
     user_id = request.session['user_id']
     if user_id:
-        appoint = PatientAppointment.objects.all()
-
+        appoint = PatientAppointment.objects.filter(doctor__user_id=user_id)
+        print(appoint, '========appoint')
         context = {
             'appoint': appoint
         }

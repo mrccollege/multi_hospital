@@ -53,7 +53,7 @@ def doctor_registration(request):
                                               user_type=user_type,
                                               )
         if user:
-            DoctorUser.objects.create(user_id=user.id, hospital_id=1)
+            DoctorUser.objects.create(user_id=user.id, hospital_id=2)
             return render(request, 'doctor_user.html')
 
     return render(request, 'doctor_user.html')

@@ -16,8 +16,8 @@ class CustomUser(AbstractUser):
     user_type = models.CharField(max_length=10)
     specialization = models.CharField(max_length=100, null=True, blank=True, default=None)
     degree = models.CharField(max_length=500, null=True, blank=True, default=None)
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
+    # is_active = models.BooleanField(default=True)
+    # is_staff = models.BooleanField(default=False)
 
     date_joined = models.DateTimeField(default=timezone.now)
 

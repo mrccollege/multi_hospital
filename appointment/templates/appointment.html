@@ -26,6 +26,11 @@
         label {
             font-weight: bold;
         }
+
+
+
+
+
     </style>
 
     <style>
@@ -46,6 +51,11 @@
         .result:hover {
             background-color: #f5f5f5;
         }
+
+
+
+
+
     </style>
 </head>
 <body>
@@ -60,13 +70,24 @@
                 <div id="patient-search-results-dropdown"></div>
             </div>
 
+            <!--            <div class="col-lg-6 mb-3">-->
+            <!--                <label for="doctorName" class="form-label">Doctor's Name</label>-->
+            <!--                <input type="text" class="form-control" id="doctorName" placeholder="Enter or select a doctor's name">-->
+            <!--                <input type="hidden" name="doctorID" id="doctorID">-->
+            <!--                <div id="doctor-search-results-dropdown"></div>-->
+
+            <!--            </div>-->
+
             <div class="col-lg-6 mb-3">
                 <label for="doctorName" class="form-label">Doctor's Name</label>
-                <input type="text" class="form-control" id="doctorName" placeholder="Enter or select a doctor's name">
-                <input type="hidden" name="doctorID" id="doctorID">
-                <div id="doctor-search-results-dropdown"></div>
-
+                <select name="" id="" class="form-control">
+                    <option value="">Select Doctor</option>
+                    {% for doctor in doctor %}
+                    <option value="{{doctor.p_id}}">{{doctor.user.full_name}}</option>
+                    {% endfor%}
+                </select>
             </div>
+
         </div>
         <!-- Rest of the form remains unchanged -->
         <div class="row">
@@ -80,16 +101,53 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-lg-6 mb-3">
+            <div class="col-lg-4 mb-3">
                 <label for="bloodPressure" class="form-label">Blood Pressure</label>
-                <input type="text" class="form-control" name="bloodPressure" id="bloodPressure" placeholder="Enter BP (e.g., 120/80)">
+                <input type="text" class="form-control" name="bloodPressure" id="bloodPressure"
+                       placeholder="Enter BP (e.g., 120/80)">
             </div>
-            <div class="col-lg-6 mb-3">
+            <div class="col-lg-4 mb-3">
+                <label for="pulse" class="form-label">Pulse</label>
+                <input type="text" class="form-control" name="pulse" id="pulse" placeholder="Enter pulse">
+            </div>
+            <div class="col-lg-4 mb-3">
                 <label for="weight" class="form-label">Weight (kg)</label>
-                <input type="number" class="form-control" name="weight" id="weight" placeholder="Enter weight in kilograms">
+                <input type="number" class="form-control" name="weight" id="weight"
+                       placeholder="Enter weight in kilograms">
             </div>
         </div>
-        <button type="submit" class="btn btn-primary">Schedule Appointment</button>
+
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <select name="" id="" class="form-control">
+                            <option money="250" value="OPD 09 AM TO 01 PM ">OPD 09 AM TO 01 PM</option>
+                            <option money="350" value="OPD 01 AM TO 05 PM ">OPD 01 AM TO 05 PM</option>
+                            <option money="500" value="EMERGENCY Above 05 PM">EMERGENCY Above 05 PM</option>
+                        </select>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <input class="form-control" type="text" name="" id="" value="">
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-2">
+                <input checked type="radio" name="paid_free" id="" value="Paid">
+                <label>Paid</label>
+
+                <input type="radio" name="paid_free" id="" value="Free">
+                <label>Free</label>
+            </div>
+
+            <div class="col-lg-8">
+                <button type="submit" class="btn btn-primary">Schedule Appointment</button>
+            </div>
+        </div>
+
+
     </form>
 </div>
 <!-- Link to Bootstrap JS (Optional) -->
@@ -153,6 +211,11 @@ $(document).ready(function () {
 
 
 
+
+
+
+
+
 </script>
 
 <script>
@@ -209,6 +272,11 @@ $(document).ready(function () {
         }
     });
 });
+
+
+
+
+
 
 
 
