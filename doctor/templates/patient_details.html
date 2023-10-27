@@ -80,7 +80,22 @@
             <p><strong>Address:</strong> {{appoint.patient.user.address}}</p>
         </div>
         <div class="medicine-list">
-            <h3>Medicine Details</h3>
+            <div class="row">
+                <div class="col-lg-4">
+                    <h3 class="m-1">Medicine Details</h3>
+                </div>
+                <div class="col-lg-8">
+                    <div class="d-flex mx-auto">
+                        <div class="m-1">
+                            <button class="btn btn-success">save</button>
+                        </div>
+                        <div class="m-1">
+                            <button class="btn btn-primary">update</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <table class="table table-bordered medicine-table">
                 <thead>
                     <tr>

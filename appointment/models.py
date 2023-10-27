@@ -6,6 +6,7 @@ from accounts.models import HospitalUser, DoctorUser, PatientUser
 
 
 class PatientAppointment(models.Model):
+    patient_appoint_id = models.AutoField(primary_key=True)
     hospital = models.ForeignKey(HospitalUser, on_delete=models.CASCADE)
     doctor = models.ForeignKey(DoctorUser, on_delete=models.CASCADE)
     patient = models.ForeignKey(PatientUser, on_delete=models.CASCADE)

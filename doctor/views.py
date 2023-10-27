@@ -42,8 +42,8 @@ def doctor_logout(request):
 
 
 def patient_report(request, appointment_id):
-    appoint = PatientAppointment.objects.get(id=appointment_id)
+    appoint = PatientAppointment.objects.get(patient_appoint_id=appointment_id)
     context = {
         'appoint': appoint,
     }
-    return render(request, 'patient_report.html', context)
+    return render(request, 'patient_details.html', context)
