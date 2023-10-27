@@ -86,16 +86,17 @@
                 <thead>
                 <tr>
                     <th>Patient Name</th>
-                    <th>DOB</th>
+                    <th>Age</th>
                     <th>Condition</th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for appoint in appoint %}
                 <tr>
-                    <td>{{appoint.patient.user.full_name}}</td>
-                    <td>1980-05-15</td>
+                    <td>{{appoint.patient.user.full_name|title}}</td>
+                    <td>{{appoint.patient.user.age}}</td>
                     <td>Hypertension</td>
+                    <td><a href="/doctor/patient-report/{{appoint.id}}/" target="_blank">view</a></td>
                 </tr>
                 {% endfor %}
 

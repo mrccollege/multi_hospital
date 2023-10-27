@@ -63,6 +63,19 @@
                 margin-left: 0;
             }
         }
+
+        .sidebar {
+            width: 250px; /* Adjust the width as needed */
+            height: 100%; /* Set a fixed height for the sidebar */
+            overflow-y: auto; /* Add vertical scrollbar if content exceeds the height */
+        }
+
+        .sidebar-content {
+            padding: 10px; /* Add some padding to the content inside the sidebar */
+        }
+
+        /* Your existing CSS styles for the sidebar icons can go here */
+
     </style>
 </head>
 <body>
@@ -70,9 +83,12 @@
 <div class="sidebar">
     <a href="#"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
     <a href="#"><i class="fas fa-chart-bar"></i> Reports</a>
-    <a href="#"><i class="fas fa-users"></i> Users</a>
+    <a href="/accounts/doctor_registration/" target="_blank"><i class="fas fa-user-md"></i> Add Doctor</a>
+    <a href="/accounts/patient_registration/" target="_blank"><i class="fas fa-wheelchair"></i> Add Patient</a>
+    <a href="/appointment/patient-appointment/" target="_blank"><i class="fas fa-calendar"></i> Add Appointment</a>
+    <a href="/accounts/main_medical_store_registration/" target="_blank"><i class="fas fa-clinic-medical"></i> Add Main Store</a>
+    <a href="/accounts/mini_medical_store_registration/" target="_blank"><i class="fas fa-clinic-medical"></i> Add Mini Store</a>
     <a href="#"><i class="fas fa-cog"></i> Settings</a>
-    <button onclick="reloadDataTable()"><i class="fas fa-sync-alt"></i> Reload Data</button>
 </div>
 
 <div class="content">

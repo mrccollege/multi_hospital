@@ -9,7 +9,7 @@ class CustomUser(AbstractUser):
     email = models.EmailField(unique=True, null=True, blank=True, default=None)
     password = models.CharField(max_length=16)
     address = models.TextField(null=True, blank=True)
-    dob = models.DateField(null=True, blank=True)
+    age = models.IntegerField(null=True, blank=True)
     gender = models.CharField(max_length=10, null=True, blank=True, default=None)
     mobile = models.CharField(max_length=15, null=True, blank=True)
     phone = models.CharField(max_length=25, null=True, blank=True)
@@ -25,12 +25,15 @@ class CustomUser(AbstractUser):
         db_table = 'user'
 
     def __str__(self):
-        return self.username
+        return str(self.username)
 
 
 class HospitalUser(models.Model):
     h_id = models.AutoField(primary_key=True)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return str(self.user.username)
 
 
 class DoctorUser(models.Model):
@@ -38,8 +41,14 @@ class DoctorUser(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     hospital = models.ForeignKey(HospitalUser, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return str(self.user.username)
+
 
 class PatientUser(models.Model):
     p_id = models.AutoField(primary_key=True)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     hospital = models.ForeignKey(HospitalUser, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return str(self.user.username)

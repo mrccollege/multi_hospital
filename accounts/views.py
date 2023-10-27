@@ -1,7 +1,7 @@
 from django.shortcuts import render
 
 # Create your views here.
-from store.models import MainMedicalStore, MiniMedicalStore
+from store.models import MainStore, MiniStore
 from .models import CustomUser, HospitalUser, DoctorUser, PatientUser
 
 
@@ -54,7 +54,7 @@ def doctor_registration(request):
                                               user_type=user_type,
                                               )
         if user:
-            DoctorUser.objects.create(user_id=user.id, hospital_id=2)
+            DoctorUser.objects.create(user_id=user.id, hospital_id=1)
             return render(request, 'doctor_user.html')
 
     return render(request, 'doctor_user.html')
@@ -64,7 +64,7 @@ def patient_registration(request):
     if request.method == 'POST':
         form = request.POST
         full_name = form.get('patientName')
-        dob = form.get('dob')
+        age = form.get('age')
         gender = form.get('gender')
         email = form.get('email')
         password = form.get('password')
@@ -73,7 +73,7 @@ def patient_registration(request):
         user_type = 'PATIENT'
         user = CustomUser.objects.create_user(full_name=full_name,
                                               username=email,
-                                              dob=dob,
+                                              age=age,
                                               gender=gender,
                                               email=email,
                                               password=password,
@@ -103,7 +103,7 @@ def main_medical_store_registration(request):
                                               user_type=user_type,
                                               )
         if user:
-            MainMedicalStore.objects.create(user_id=user.id, hospital_id=1)
+            MainStore.objects.create(main_store_user_id=user.id, hospital_user_id=1)
             return render(request, 'main_medical_store_register.html')
 
     return render(request, 'main_medical_store_register.html')
@@ -111,7 +111,7 @@ def main_medical_store_registration(request):
 
 def mini_medical_store_registration(request):
     if request.method == 'POST':
-        form = request.POSTs
+        form = request.POST
         medical_name = form.get('medicalName')
         username = form.get('username')
         email = form.get('email')
@@ -124,7 +124,7 @@ def mini_medical_store_registration(request):
                                               user_type=user_type,
                                               )
         if user:
-            MiniMedicalStore.objects.create(user_id=user.id, hospital_id=1)
+            MiniStore.objects.create(mini_store_user_id=user.id, hospital_user_id=1)
             return render(request, 'mini_medical_store_register.html')
 
     return render(request, 'mini_medical_store_register.html')

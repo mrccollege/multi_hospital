@@ -11,7 +11,6 @@ def doctor_dashboard(request):
     user_id = request.session['user_id']
     if user_id:
         appoint = PatientAppointment.objects.filter(doctor__user_id=user_id)
-        print(appoint, '========appoint')
         context = {
             'appoint': appoint
         }
@@ -40,3 +39,11 @@ def doctor_login(request):
 def doctor_logout(request):
     logout(request)
     return redirect('/doctor/login/')
+
+
+def patient_report(request, appointment_id):
+    appoint = PatientAppointment.objects.get(id=appointment_id)
+    context = {
+        'appoint': appoint,
+    }
+    return render(request, 'patient_report.html', context)

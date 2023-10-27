@@ -1,8 +1,10 @@
 from django.contrib import admin
-from .models import MiniMedicalStore, MainMedicalStore, MiniStoreMedicine, Medicine
+from .models import MiniStore, MainStore, Medicine, MappingMedicine, MappingMiniStorMedicine, MedicineTransactionHistory
 
 # Register your models here.
-admin.site.register(MainMedicalStore)
-admin.site.register(MiniMedicalStore)
+admin.site.register(MainStore)
+admin.site.register(MiniStore)
 admin.site.register(Medicine)
-admin.site.register(MiniStoreMedicine)
+admin.site.register(MappingMedicine)
+admin.site.register(MappingMiniStorMedicine)
+admin.site.register(MedicineTransactionHistory)

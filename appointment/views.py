@@ -15,6 +15,7 @@ def patient_appointment(request):
         appointment_time = form.get('appointmentTime')
         blood_pressure = form.get('bloodPressure')
         weight = form.get('weight')
+        print(doctor_id,'===========doctor_id')
         appoint = PatientAppointment.objects.create(hospital_id=hospital,
                                                     patient_id=patient_id,
                                                     doctor_id=doctor_id,

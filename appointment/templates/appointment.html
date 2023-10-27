@@ -51,11 +51,6 @@
         .result:hover {
             background-color: #f5f5f5;
         }
-
-
-
-
-
     </style>
 </head>
 <body>
@@ -79,11 +74,11 @@
             <!--            </div>-->
 
             <div class="col-lg-6 mb-3">
-                <label for="doctorName" class="form-label">Doctor's Name</label>
-                <select name="" id="" class="form-control">
+                <label for="doctorID" class="form-label">Doctor's Name</label>
+                <select name="doctorID" id="doctorID" class="form-control">
                     <option value="">Select Doctor</option>
                     {% for doctor in doctor %}
-                    <option value="{{doctor.p_id}}">{{doctor.user.full_name}}</option>
+                    <option value="{{doctor.d_id}}">{{doctor.user.full_name}}</option>
                     {% endfor%}
                 </select>
             </div>
@@ -97,7 +92,8 @@
             </div>
             <div class="col-lg-6 mb-3">
                 <label for="appointmentTime" class="form-label">Appointment Time</label>
-                <input type="time" class="form-control" name="appointmentTime" id="appointmentTime">
+                <input type="time" id="timepicker" class="form-control" name="appointmentTime" id="appointmentTime">
+
             </div>
         </div>
         <div class="row">
@@ -146,8 +142,6 @@
                 <button type="submit" class="btn btn-primary">Schedule Appointment</button>
             </div>
         </div>
-
-
     </form>
 </div>
 <!-- Link to Bootstrap JS (Optional) -->
@@ -208,77 +202,6 @@ $(document).ready(function () {
         }
     });
 });
-
-
-
-
-
-
-
-
-</script>
-
-<script>
-    $(document).ready(function () {
-    // Target the doctor name input field and the results dropdown
-    var $doctorNameInput = $("#doctorName");
-    var $doctorResultsDropdown = $("#doctor-search-results-dropdown");
-    var $doctorIDField = $("#doctorID");  // Added field to store doctor ID
-
-    // Event listener for input changes
-    $doctorNameInput.on("input", function () {
-        var term = $doctorNameInput.val();
-
-        // Send an AJAX request to your Django view for doctor search
-        $.ajax({
-            url: '/appointment/doctor-search/',  // Update the URL as needed
-            data: {
-                'term': term
-            },
-            dataType: 'json',
-            success: function (data) {
-                // Clear and hide the dropdown
-                $doctorResultsDropdown.empty().hide();
-
-                // Populate the results dropdown with the retrieved data
-                if (data.results.length > 0) {
-                    $.each(data.results, function (index, doctor) {
-                        var resultItem = $('<div class="result">' + doctor.name + '</div>');
-
-                        // Event listener for result item click
-                        resultItem.on("click", function () {
-                            $doctorNameInput.val(doctor.name);
-                            $doctorIDField.val(doctor.id);
-                            $doctorResultsDropdown.empty().hide();
-                        });
-
-                        $doctorResultsDropdown.append(resultItem);
-                    });
-
-                    // Show the dropdown
-                    $doctorResultsDropdown.show();
-                } else {
-                    // Clear the doctor ID field when no results found
-                    $doctorIDField.val('');
-                }
-            }
-        });
-    });
-
-    // Event listener to hide the dropdown on a click outside
-    $(document).on("click", function (event) {
-        if (!$doctorNameInput.is(event.target) && !$doctorResultsDropdown.is(event.target) && $doctorResultsDropdown.has(event.target).length === 0) {
-            $doctorResultsDropdown.empty().hide();
-        }
-    });
-});
-
-
-
-
-
-
-
 
 </script>
 
