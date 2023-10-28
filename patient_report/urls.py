@@ -1,9 +1,6 @@
 from django.urls import path
 from .import views
 urlpatterns = [
-    path('dashboard/', views.doctor_dashboard, name='doctor_dashboard'),
-    path('login/', views.doctor_login, name='doctor_login'),
-    path('logout/', views.doctor_logout, name='doctor_logout'),
-
-    path('patient-report/<int:appointment_id>', views.patient_report, name='patient_report'),
+    path('history/<int:appoint_id>/', views.patient_history_report, name='patient_history_report'),
+    path('get_history/', views.get_history, name='get_history'),
 ]
