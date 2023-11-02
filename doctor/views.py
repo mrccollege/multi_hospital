@@ -26,7 +26,7 @@ def doctor_login(request):
         username = username.strip()
         password = password.strip()
         user = CustomUser.objects.filter(username=username).first()
-        user = authenticate(username=username, password=password)
+        # user = authenticate(username=username, password=password)
         if user is not None:
             if user.user_type == 'DOCTOR':
                 login(request, user)  # Log the user in
