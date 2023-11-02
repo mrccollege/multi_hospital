@@ -27,7 +27,8 @@ def doctor_login(request):
         password = password.strip()
         user = CustomUser.objects.filter(username=username).first()
         # user = authenticate(username=username, password=password)
-        if user is not None:
+        # if user is not None:
+        if user is not None and user.check_password(password):
             if user.user_type == 'DOCTOR':
                 login(request, user)  # Log the user in
                 request.session['user_id'] = user.id
