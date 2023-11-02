@@ -88,8 +88,8 @@ WSGI_APPLICATION = 'multi_hospital_project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'mysql.connector.django',
-        'NAME': 'multi_hospital',
-        'USER': 'multi_hospital_user',
+        'NAME': 'multi_hospi',
+        'USER': 'multi_hospi',
         'PASSWORD': 'qwerty123',
         'HOST': 'localhost',
         'PORT': '3306',
