@@ -25,12 +25,19 @@ def doctor_login(request):
 
         username = username.strip()
         password = password.strip()
-        user = authenticate(username=username, password=password)
-        if user is not None:
+        user = CustomUser.objects.filter(username=username).first()
+        if user is not None and user.check_password(password):
             if user.user_type == 'DOCTOR':
                 login(request, user)  # Log the user in
                 request.session['user_id'] = user.id
                 return redirect('/doctor/dashboard/')
+
+        # user = authenticate(username=username, password=password)
+        # if user is not None:
+        #     if user.user_type == 'DOCTOR':
+        #         login(request, user)  # Log the user in
+        #         request.session['user_id'] = user.id
+        #         return redirect('/doctor/dashboard/')
         else:
             error_message = "Invalid username or password"
     return render(request, 'doctor_login.html')
