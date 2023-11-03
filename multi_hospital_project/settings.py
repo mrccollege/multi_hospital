@@ -86,17 +86,6 @@ DATABASES = {
     }
 }
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'mysql.connector.django',
-#         'NAME': 'multi_hospi',
-#         'USER': 'multi_hospi',
-#         'PASSWORD': 'qwerty123',
-#         'HOST': 'localhost',
-#         'PORT': '3306',
-#     }
-# }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
