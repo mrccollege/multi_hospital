@@ -1,4 +1,5 @@
-from django.shortcuts import render
+from django.contrib.auth import authenticate, login, logout
+from django.shortcuts import render, redirect
 
 # Create your views here.
 from store.models import MainStore, MiniStore
@@ -23,10 +24,41 @@ def hospital_registration(request):
                                               user_type=user_type,
                                               )
         if user:
-            HospitalUser.objects.create(user_id=user.id)
-            return render(request, 'hospital_user.html')
+            obj = HospitalUser.objects.create(user_id=user.id)
+            if obj:
+                return redirect('/accounts/hospital-login/')
 
     return render(request, 'hospital_user.html')
+
+
+def hospital_login(request):
+    if request.method == 'POST':
+        form = request.POST
+        username = form.get('email')
+        password = form.get('password')
+
+        username = username.strip()
+        password = password.strip()
+        try:
+            user = CustomUser.objects.filter(username=username).first()
+        except Exception as e:
+            print(e, '===========e==========')
+            user = None
+
+        if user is not None:
+            if user.user_type == 'HOSPITAL':
+                user = authenticate(username=username, password=password)
+                login(request, user)
+                request.session['hospital_user_id'] = user.id
+                return redirect('/')
+        else:
+            error_message = "Invalid username or password"
+    return render(request, 'hospital_login.html')
+
+
+def user_logout(request):
+    logout(request)
+    return redirect('/')
 
 
 def doctor_registration(request):
@@ -54,10 +86,14 @@ def doctor_registration(request):
                                               user_type=user_type,
                                               )
         if user:
-            DoctorUser.objects.create(user_id=user.id, hospital_id=1)
-            return render(request, 'doctor_user.html')
+            hospital_user_id = request.session.get('hospital_user_id')
+            h_id = HospitalUser.objects.get(user_id=hospital_user_id)
+            DoctorUser.objects.create(user_id=user.id, hospital_id=h_id.h_id)
+            return redirect('/')
 
-    return render(request, 'doctor_user.html')
+    else:
+        hospital_user_id = request.session.get('hospital_user_id')
+        return render(request, 'doctor_user.html')
 
 
 def patient_registration(request):
@@ -82,8 +118,10 @@ def patient_registration(request):
                                               user_type=user_type,
                                               )
         if user:
-            PatientUser.objects.create(user_id=user.id, hospital_id=1)
-            return render(request, 'patient_user.html')
+            hospital_user_id = request.session.get('hospital_user_id')
+            h_id = HospitalUser.objects.get(user_id=hospital_user_id)
+            PatientUser.objects.create(user_id=user.id, hospital_id=h_id.h_id)
+            return redirect('/')
 
     return render(request, 'patient_user.html')
 
@@ -103,8 +141,11 @@ def main_medical_store_registration(request):
                                               user_type=user_type,
                                               )
         if user:
-            MainStore.objects.create(main_store_user_id=user.id, hospital_user_id=1)
-            return render(request, 'main_medical_store_register.html')
+            hospital_user_id = request.session.get('hospital_user_id')
+            h_id = HospitalUser.objects.get(user_id=hospital_user_id)
+            obj = MainStore.objects.create(main_store_user_id=user.id, hospital_id=h_id.h_id)
+            if obj:
+                return redirect('/')
 
     return render(request, 'main_medical_store_register.html')
 
@@ -124,7 +165,10 @@ def mini_medical_store_registration(request):
                                               user_type=user_type,
                                               )
         if user:
-            MiniStore.objects.create(mini_store_user_id=user.id, hospital_user_id=1)
-            return render(request, 'mini_medical_store_register.html')
+            hospital_user_id = request.session.get('hospital_user_id')
+            h_id = HospitalUser.objects.get(user_id=hospital_user_id)
+            obj = MiniStore.objects.create(mini_store_user_id=user.id, hospital_id=h_id.h_id)
+            if obj:
+                return redirect('/')
 
     return render(request, 'mini_medical_store_register.html')

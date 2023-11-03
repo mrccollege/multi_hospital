@@ -86,6 +86,8 @@
     <a href="/accounts/doctor_registration/" target="_blank"><i class="fas fa-user-md"></i> Add Doctor</a>
     <a href="/accounts/patient_registration/" target="_blank"><i class="fas fa-wheelchair"></i> Add Patient</a>
     <a href="/appointment/patient-appointment/" target="_blank"><i class="fas fa-calendar"></i> Add Appointment</a>
+    <a href="/store/add_medicine/" target="_blank"><i class="fas fa-capsules"></i> Add Medicine</a>
+    <a href="/store/mapping-medicine/" target="_blank"><i class="fas fa-capsules"></i> Add Medicine to Main Store</a>
     <a href="/accounts/main_medical_store_registration/" target="_blank"><i class="fas fa-clinic-medical"></i> Add Main Store</a>
     <a href="/accounts/mini_medical_store_registration/" target="_blank"><i class="fas fa-clinic-medical"></i> Add Mini Store</a>
     <a href="#"><i class="fas fa-cog"></i> Settings</a>
@@ -106,16 +108,21 @@
                     <a class="nav-link" href="#">Features</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Pricing</a>
+                    <a class="nav-link" href="">Pricing</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
                 </li>
+                {% if request.user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link" href="/accounts/user_logout/">Logout</a>
+                </li>
+                {% endif %}
             </ul>
         </div>
     </nav>
     <div class="container mt-4">
-        <h1>Welcome to your dashboard</h1>
+        <h1> {{hospital_name|title}} Welcome to your dashboard</h1>
         <p>This is the main content area.</p>
 
         <h2>List of Users</h2>

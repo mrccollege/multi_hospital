@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Django DataTable Example</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="modal fade" id="userInfoModal" tabindex="-1" aria-labelledby="userInfoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="userInfoModalLabel">Mini Medical Store Information</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body modal-header">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <select id="selectOptions" class="form-select">
+                        </select>
+                    </div>
+                    <div class="col-lg-4">
+                        <input type="text" name="medicine_qty" id="medicine_qty" class="form-control" placeholder="Enter medicine qty">
+                        <input type="hidden" value="" id="hidden_medicine_id">
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success" id="transfer_medicine" data-bs-dismiss="modal">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container mt-4">
+    <h2>Sample DataTable</h2>
+    <table id="myTable" class="table table-striped">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Qty</th>
+            <th>Price</th>
+            <th>Expiration</th>
+            <th>Hospital</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for medicine in medicine %}
+        <tr>
+            <td>{{ medicine.medicine.name }}</td>
+            <td>{{ medicine.main_qty }}</td>
+            <td>{{ medicine.medicine.price }}</td>
+            <td>{{ medicine.medicine.expiration }}</td>
+            <td>{{ medicine.medicine.hospital }}</td>
+            <td>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                        onclick="transfer_medicine('{{medicine.mapping_id}}')" data-bs-target="#userInfoModal">Transfer
+                </button>
+            </td>
+
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#myTable').DataTable();
+    });
+</script>
+
+<script>
+    function transfer_medicine(medicine_id) {
+        alert(medicine_id)
+        $.ajax({
+            url: '/store/get_mini_store_model_data/',
+            type: 'GET',
+            data:{main_store_id:'{{main_store_id}}'},
+            success: function (data) {
+                var select = $('#selectOptions');
+                select.empty();
+                $.each(data.mini_store, function (index, item) {
+                    select.append('<option value="' + item.mini_store_id + '">' + item.mini_store_name + '</option>');
+                });
+                select.show();
+                $('#hidden_medicine_id').val(medicine_id)
+            }
+        });
+    }
+
+    $('#transfer_medicine').click(function(){
+        var medicine_id = $('#hidden_medicine_id').val()
+        var mini_store_id = $('#selectOptions').val()
+        var medicine_qty = $('#medicine_qty').val()
+        $.ajax({
+            url: '/store/transfer_medicine_to_mini_store/',
+            type: 'GET',
+            data:{
+                'main_store_id': '{{main_store_id}}'
+                'medicine_id': medicine_id,
+                'mini_store_id': mini_store_id,
+                'medicine_qty' : medicine_qty,
+            },
+            success: function (data) {
+                console.log(data)
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

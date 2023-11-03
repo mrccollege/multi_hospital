@@ -15,7 +15,7 @@ class PatientAppointment(models.Model):
     appointment_date = models.DateField(default=None)
     appointment_time = models.TimeField(default=None)
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    updated_at = models.DateTimeField(null=True)
 
     class Meta:
         db_table = 'patient_appointment'

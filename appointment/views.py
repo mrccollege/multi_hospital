@@ -1,22 +1,22 @@
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
-from accounts.models import DoctorUser, PatientUser
+from accounts.models import DoctorUser, PatientUser, HospitalUser
 from .models import PatientAppointment
 
 
 # Create your views here.
 def patient_appointment(request):
     if request.method == 'POST':
+        hospital_user_id = request.session.get('hospital_user_id')
+        h_id = HospitalUser.objects.get(user_id=hospital_user_id)
         form = request.POST
-        hospital = 1
         patient_id = form.get('patientID')
         doctor_id = form.get('doctorID')
         appointment_date = form.get('appointmentDate')
         appointment_time = form.get('appointmentTime')
         blood_pressure = form.get('bloodPressure')
         weight = form.get('weight')
-        print(doctor_id,'===========doctor_id')
-        appoint = PatientAppointment.objects.create(hospital_id=hospital,
+        appoint = PatientAppointment.objects.create(hospital_id=h_id.h_id,
                                                     patient_id=patient_id,
                                                     doctor_id=doctor_id,
                                                     appointment_date=appointment_date,
@@ -25,7 +25,7 @@ def patient_appointment(request):
                                                     weight=weight, )
 
         if appoint:
-            return redirect('/appointment/patient-appointment/')
+            return redirect('/')
     doctor = DoctorUser.objects.filter()
     context = {
         'doctor': doctor

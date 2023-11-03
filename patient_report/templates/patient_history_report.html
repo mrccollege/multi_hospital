@@ -49,6 +49,7 @@
             background-color: #f0f0f0;
         }
 
+
     </style>
     <style>
         .search-results-dropdown {
@@ -68,6 +69,7 @@
         .result:hover {
             background-color: #f5f5f5;
         }
+
 
     </style>
 </head>
@@ -89,7 +91,8 @@
             <h3 class="m-1" style="text-align:center;">Click on date and watch history</h3>
 
             {% for i in history_dates %}
-            <button onclick="get_history('{{i|date:"d-m-Y"}}')" type="button" class="btn btn-light">{{i|date:"d-m-Y"}}</button>
+            <button onclick="get_history('{{i|date:" d-m-Y
+            "}}')" type="button" class="btn btn-light">{{i|date:"d-m-Y"}}</button>
             {% endfor %}
 
             <h3 class="m-1">Medicine Details</h3>
@@ -114,71 +117,36 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-<script>
 
-<!--    $(document).ready(function(){-->
-<!--        $("#datepicker").datepicker();-->
-<!--    });-->
+
+<script>
+    function get_history(date_value){
+        $.ajax({
+            url: '/patient_report/get_history/',
+            method: 'GET',
+            data: {
+                selectedDate: date_value,
+                head_id: $('#head_id').val()
+            },
+            success: function(response) {
+                var data  = response.data_list
+                $('table tbody').html('');
+                $.each(data, function(index, item) {
+                    var html = '';
+                    html += '<tr id="medicine_tr">';
+                    html += '<td><input type="text" id="medicine" name="medicine" class="form-control" value="'+item.medicine+'" autocomplete="off" readonly></td>';
+                    html += '<input type="hidden" name="medicine_id" id="medicine_id">';
+                    html += '<td><input type="text" id="dosage" name="dosage" value="'+item.dosage+'" class="form-control" readonly></td>';
+                    html += '<td><input type="text" id="frequency" name="frequency" class="form-control" value="'+item.frequency+'" readonly></td>';
+                    html += '</tr>';
+                    $('table tbody').append(html);
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error(status + ": " + error);
+            }
+        });
+    }
 </script>
-
-
-<script>
-<!--        $(document).ready(function() {-->
-<!--            $('#datepicker').datepicker({-->
-<!--                dateFormat: 'dd-mm-yy',-->
-<!--                changeMonth: true,-->
-<!--                changeYear: true,-->
-<!--                onSelect: function(dateText, inst) {-->
-<!--                    console.log(dateText,'====================dateText')-->
-<!--                    $.ajax({-->
-<!--                        url: '/patient_report/get_history/',-->
-<!--                        method: 'GET',-->
-<!--                        data: {-->
-<!--                            selectedDate: dateText,-->
-<!--                             head_id: $('#head_id').val()},-->
-<!--                        success: function(response) {-->
-<!--                            console.log(response.data_list,'===================date')-->
-<!--                        },-->
-<!--                        error: function(xhr, status, error) {-->
-<!--                            console.error(status + ": " + error);-->
-<!--                        }-->
-<!--                    });-->
-<!--                }-->
-<!--            });-->
-<!--        });-->
-
-
-        function get_history(date_value){
-
-            $.ajax({
-                url: '/patient_report/get_history/',
-                method: 'GET',
-                data: {
-                    selectedDate: date_value,
-                    head_id: $('#head_id').val()
-                },
-                success: function(response) {
-                    var data  = response.data_list
-                    $('table tbody').html('');
-                    $.each(data, function(index, item) {
-                        var html = '';
-                        html += '<tr id="medicine_tr">';
-                        html += '<td><input type="text" id="medicine" name="medicine" class="form-control" value="'+item.medicine+'" autocomplete="off" readonly></td>';
-                        html += '<input type="hidden" name="medicine_id" id="medicine_id">';
-                        html += '<td><input type="text" id="dosage" name="dosage" value="'+item.dosage+'" class="form-control" readonly></td>';
-                        html += '<td><input type="text" id="frequency" name="frequency" class="form-control" value="'+item.frequency+'" readonly></td>';
-                        html += '</tr>';
-                        $('table tbody').append(html);
-                    });
-
-
-
-                },
-                error: function(xhr, status, error) {
-                    console.error(status + ": " + error);
-                }
-            });
-        }
-    </script>
 </body>
 </html>

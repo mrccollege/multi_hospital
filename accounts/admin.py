@@ -2,17 +2,16 @@ from django.contrib import admin
 from .models import CustomUser, HospitalUser, DoctorUser, PatientUser
 
 
-# Register your models here.
 class HospitalAdmin(admin.ModelAdmin):
     list_display = ('h_id', 'user')
 
 
 class DoctorAdmin(admin.ModelAdmin):
-    list_display = ('d_id', 'user')
+    list_display = ('d_id', 'user', 'hospital')
 
 
 class PatientAdmin(admin.ModelAdmin):
-    list_display = ('p_id', 'user')
+    list_display = ('p_id', 'user', 'hospital')
 
 
 admin.site.register(CustomUser)
