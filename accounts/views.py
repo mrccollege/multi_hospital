@@ -88,8 +88,9 @@ def doctor_registration(request):
         if user:
             hospital_user_id = request.session.get('hospital_user_id')
             h_id = HospitalUser.objects.get(user_id=hospital_user_id)
-            DoctorUser.objects.create(user_id=user.id, hospital_id=h_id.h_id)
-            return redirect('/')
+            doctor = DoctorUser.objects.create(user_id=user.id, hospital_id=h_id.h_id)
+            if doctor:
+                return redirect('/')
 
     else:
         hospital_user_id = request.session.get('hospital_user_id')

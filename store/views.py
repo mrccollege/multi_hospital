@@ -2,7 +2,8 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect
 
 from accounts.models import HospitalUser
-from .models import Medicine, MappingMedicine, MainStore, MainMedicalStoreMedicineTransactionHistory, MiniStore
+from .models import Medicine, MappingMedicine, MainStore, MainMedicalStoreMedicineTransactionHistory, MiniStore, \
+    MappingMiniStorMedicine
 
 
 # Create your views here.
@@ -112,14 +113,39 @@ def main_medicine_transaction(mapping_id, qty):
 def view_main_store(request, main_store_id):
     if request.method == 'GET':
         medicine = MappingMedicine.objects.filter(main_store_user_id=main_store_id)
+        hospital_id = medicine[0].main_store_user.hospital.h_id
+        mini_store = MiniStore.objects.all()
         if medicine:
             context = {
+                'hospital_id': hospital_id,
                 'main_store_id': main_store_id,
-                'medicine': medicine
+                'medicine': medicine,
+                'mini_store': mini_store,
             }
             return render(request, 'view_main_store.html', context)
         else:
             return redirect('/store/mapping-medicine/')
+
+def view_mini_stores_record(request, mini_store_id, hospital_id):
+    if request.method == 'GET':
+        medicine = MappingMiniStorMedicine.objects.filter(mini_store_user_id=mini_store_id)
+        mini_store = MiniStore.objects.filter(hospital_id=hospital_id)
+        if medicine:
+            context = {
+                'hospital_id': hospital_id,
+                'mini_store_id': mini_store_id,
+                'mini_store': mini_store,
+                'medicine': medicine,
+            }
+            return render(request, 'mini_store_record.html', context)
+        else:
+            context = {
+                'hospital_id': hospital_id,
+                'mini_store_id': mini_store_id,
+                'mini_store': mini_store,
+                'medicine': medicine,
+            }
+            return render(request, 'mini_store_record.html', context)
 
 
 def get_mini_store_model_data(request):
@@ -155,11 +181,35 @@ def transfer_medicine_to_mini_store(request):
         mini_store_id = form.get('mini_store_id')
         medicine_id = form.get('medicine_id')
         medicine_qty = form.get('medicine_qty')
-        MappingMiniStorMedicine.objects.create(mini_qty=medicine_qty,
-                                               medicine_id=medicine_id,
-                                               )
+        status = 0
+        msg = 'Medicine not Transferred .'
+        is_exists = MappingMiniStorMedicine.objects.filter(medicine_id=medicine_id,
+                                                           mini_store_user_id=mini_store_id).exists()
+        if is_exists == True:
+            obj = MappingMiniStorMedicine.objects.get(medicine_id=medicine_id, mini_store_user_id=mini_store_id)
+            obj_mini_qty = obj.mini_qty
+            obj_mini_qty = int(obj_mini_qty) + int(medicine_qty)
 
-        context = {
-            ''
-        }
-        return JsonResponse(context)
+            obj = MappingMiniStorMedicine.objects.filter(medicine_id=medicine_id,
+                                                         mini_store_user_id=mini_store_id).update(mini_qty=obj_mini_qty)
+        else:
+            obj = MappingMiniStorMedicine.objects.create(mini_qty=medicine_qty,
+                                                         medicine_id=medicine_id,
+                                                         mini_store_user_id=mini_store_id
+                                                         )
+        if obj:
+            medicine = MappingMedicine.objects.filter(mapping_id=medicine_id, main_store_user_id=main_store_id)
+            if medicine:
+                medicine = medicine[0].main_qty
+            obj = MappingMedicine.objects.filter(mapping_id=medicine_id, main_store_user_id=main_store_id).update(
+                main_qty=int(medicine) - int(medicine_qty))
+            if obj:
+                status = 1
+                msg = 'medicine transfer to mini store successfully.'
+            else:
+                status = status
+            context = {
+                'status': status,
+                'msg': msg
+            }
+            return JsonResponse(context)

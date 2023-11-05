@@ -60,7 +60,7 @@
         <div class="row">
             <div class="col-lg-6 mb-3">
                 <label for="patientName" class="form-label">Patient Name</label>
-                <input type="text" class="form-control" id="patientName" placeholder="Enter or select a patient name">
+                <input type="text" class="form-control" id="patientName" placeholder="Enter or select a patient name" autocomplete="off">
                 <input type="hidden" name="patientID" id="patientID">
                 <div id="patient-search-results-dropdown"></div>
             </div>
@@ -176,7 +176,7 @@ $(document).ready(function () {
                 // Populate the results dropdown with the retrieved data
                 if (data.results.length > 0) {
                     $.each(data.results, function (index, patient) {
-                        var resultItem = $('<div class="result">' + patient.name + '</div>');
+                        var resultItem = $('<div class="result">' + patient.name + ' <span>'+patient.mobile+'</span></div>');
 
                         // Event listener for result item click
                         resultItem.on("click", function () {

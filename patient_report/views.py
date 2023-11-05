@@ -9,32 +9,32 @@ from .models import HeaderPatient, DetailsPatient
 
 def patient_history_report(request, appoint_id):
     head = HeaderPatient.objects.filter(appointment_id=appoint_id)
+    medicine_history_date = ''
     if head:
-        medicine_history_date = DetailsPatient.objects.filter(header_id=head[0].head_id).values_list('created_date', flat=True).distinct()[:10]
+        medicine_history_date = DetailsPatient.objects.filter(header_id=head[0].head_id).values_list('created_date',
+                                                                                                     flat=True).distinct()[:10]
+        if medicine_history_date:
+            medicine_history_date = medicine_history_date
+
         status = 1
-        context = {
-            'status': status,
-            'appoint_id': appoint_id,
-            'head': head,
-            'history_dates': medicine_history_date,
-        }
     else:
+        head = ''
+
         status = 0
-        context = {
-            'status': status,
-            'appoint_id': appoint_id,
-            'head': head,
-        }
-
-
+    context = {
+        'status': status,
+        'appoint_id': appoint_id,
+        'head': head[0],
+        'history_dates': medicine_history_date,
+    }
     return render(request, 'patient_history_report.html', context)
 
 
 def get_history(request):
     if request.method == 'GET':
         form = request.GET
-        select_date = form.get('selectedDate')
         head_id = form.get('head_id')
+        select_date = form.get('selectedDate')
         parsed_date = datetime.strptime(select_date, '%d-%m-%Y')
         formatted_date = parsed_date.strftime('%Y-%m-%d')
         details_medicine = DetailsPatient.objects.filter(header_id=head_id, created_date=formatted_date)

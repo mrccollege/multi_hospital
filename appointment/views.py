@@ -42,6 +42,7 @@ def patient_search(request):
         data_dict = {}
         data_dict['id'] = i.p_id
         data_dict['name'] = i.user.full_name
+        data_dict['mobile'] = i.user.mobile
         patient_data.append(data_dict)
 
     context = {

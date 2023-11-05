@@ -80,17 +80,3 @@ class MainMedicalStoreMedicineTransactionHistory(models.Model):
 
     class Meta:
         db_table = 'main_store_medicine_transaction_history'
-
-
-class MedicineTransactionHistory(models.Model):
-    medicine_trans_id = models.AutoField(primary_key=True)
-    main_store_medicine_trans = models.ForeignKey(MappingMedicine, related_name='main_store_medicine_trans',
-                                                  on_delete=models.CASCADE)
-    trans_main_qty = models.IntegerField(default=0)
-    mini_store_medicine_trans = models.ForeignKey(MappingMiniStorMedicine, related_name='mini_store_medicine_trans',
-                                                  on_delete=models.CASCADE)
-    trans_mini_qty = models.IntegerField(default=0)
-    trans_date = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return str(self.trans_date)

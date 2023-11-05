@@ -21,7 +21,8 @@
                         </select>
                     </div>
                     <div class="col-lg-4">
-                        <input type="text" name="medicine_qty" id="medicine_qty" class="form-control" placeholder="Enter medicine qty">
+                        <input type="text" name="medicine_qty" id="medicine_qty" class="form-control"
+                               placeholder="Enter medicine qty">
                         <input type="hidden" value="" id="hidden_medicine_id">
                     </div>
                 </div>
@@ -29,13 +30,28 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-success" id="transfer_medicine" data-bs-dismiss="modal">Save</button>
+                <button type="button" class="btn btn-success" id="transfer_medicine" data-bs-dismiss="modal">Save
+                </button>
             </div>
         </div>
     </div>
 </div>
 <div class="container mt-4">
-    <h2>Sample DataTable</h2>
+    <div class="row">
+        <div class="col-lg-6">
+            <h2>Sample DataTable</h2>
+
+        </div>
+        <div class="col-lg-6">
+            <label for="">view mini store Records</label>
+            <select name="mini_stores_list" id="mini_stores_list" class="form-control" onchange="get_mini_store_records()">
+                <option value="">Select Mini Stores</option>
+                {% for mini_store in mini_store %}
+                <option value="{{mini_store.mini_store_id}}">{{mini_store.mini_store_user}}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
     <table id="myTable" class="table table-striped">
         <thead>
         <tr>
@@ -75,6 +91,7 @@
     $(document).ready(function () {
         $('#myTable').DataTable();
     });
+
 </script>
 
 <script>
@@ -85,6 +102,7 @@
             type: 'GET',
             data:{main_store_id:'{{main_store_id}}'},
             success: function (data) {
+                console.log(data,'=============data')
                 var select = $('#selectOptions');
                 select.empty();
                 $.each(data.mini_store, function (index, item) {
@@ -104,16 +122,29 @@
             url: '/store/transfer_medicine_to_mini_store/',
             type: 'GET',
             data:{
-                'main_store_id': '{{main_store_id}}'
+                'main_store_id': '{{main_store_id}}',
                 'medicine_id': medicine_id,
                 'mini_store_id': mini_store_id,
                 'medicine_qty' : medicine_qty,
             },
             success: function (data) {
                 console.log(data)
+                if (data.status == 1){
+                    location.reload()
+                }
             }
         });
     });
+
+</script>
+
+<script>
+    function get_mini_store_records(){
+        var store_id = $('#mini_stores_list').val()
+        if (store_id){
+            window.location.href = '/store/view_mini_stores_record/'+store_id+'/'+{{hospital_id}}+'/'
+        }
+    }
 </script>
 
 </body>
