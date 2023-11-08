@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<!--    <style>-->
+<!--        /* Custom CSS for additional styling */-->
+<!--        body {-->
+<!--            background-color: #f0f0f0;-->
+<!--        }-->
+<!--        .invoice {-->
+<!--            background-color: #fff;-->
+<!--            border: 1px solid #ddd;-->
+<!--            border-radius: 5px;-->
+<!--            margin: 10px auto;-->
+<!--            padding: 20px;-->
+<!--            width: 80%;-->
+<!--        }-->
+<!--        .invoice-header {-->
+<!--            border-bottom: 1px solid #ddd;-->
+<!--            padding-bottom: 10px;-->
+<!--            margin-bottom: 20px;-->
+<!--        }-->
+<!--        .invoice-header h1 {-->
+<!--            font-size: 24px;-->
+<!--        }-->
+<!--        .patient-info {-->
+<!--            margin-bottom: 20px;-->
+<!--        }-->
+<!--        .patient-info p {-->
+<!--            margin: 0;-->
+<!--        }-->
+<!--        .medicine-list {-->
+<!--            margin-bottom: 20px;-->
+<!--        }-->
+<!--        .medicine-list h3 {-->
+<!--            font-size: 18px;-->
+<!--            margin-bottom: 10px;-->
+<!--        }-->
+<!--        .medicine-table th,-->
+<!--        .medicine-table td {-->
+<!--            text-align: left;-->
+<!--        }-->
+<!--        .medicine-table th {-->
+<!--            background-color: #f0f0f0;-->
+<!--        }-->
+<!--    </style>-->
+    <style>
+        .search-results-dropdown {
+            position: absolute;
+            z-index: 1;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .result {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .result:hover {
+            background-color: #f5f5f5;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="invoice">
+        <div class="invoice-header text-center">
+            <h1>Patient Bill</h1>
+        </div>
+        <div class="patient-info">
+
+            <p><strong>Patient Name:</strong> {{header.appointment.patient.user.full_name|title}}</p>
+            <p><strong>Age:</strong> {{header.appointment.patient.user.age}}</p>
+            <p><strong>Gender:</strong> {{header.appointment.patient.user.gender|title}}</p>
+            <p><strong>Contact:</strong> {{header.appointment.patient.user.mobile}}</p>
+            <p><strong>Address:</strong> {{header.appointment.patient.user.address}}</p>
+        </div>
+        <div class="medicine-list">
+            <form id="patient_report_form" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" name="patient_id" value="{{header.appointment.patient.user.id}}">
+                <input type="hidden" name="hospital_id" value="{{header.appointment.hospital.user.id}}">
+                <input type="hidden" name="doctor_id" value="{{header.appointment.doctor.user.id}}">
+                <div class="d-flex mx-auto">
+                    <div class="m-1">
+                        <button class="btn btn-success" id="submitForm">Print</button>
+                    </div>
+                    <div class="m-1">
+                        <a href="/patient_report/history/{{appoint.patient_appoint_id}}/" target="_blank"
+                           class="btn btn-primary">History</a>
+                    </div>
+
+                    <div class="m-1">
+                        <label>Cash</label>
+                        <input type="number" class="form-control" name="cash_amount" id="cash_amount" placeholder="Enter Cash Amount" value="0">
+                    </div>
+
+                    <div class="m-1">
+                        <label>Online</label>
+                        <input type="number" class="form-control" name="online_amount" id="online_amount" placeholder="Enter Online Amount" value="0">
+                    </div>
+
+                    <div class="m-1">
+                        <label>Remaining</label>
+                        <input type="number" class="form-control" name="remaining_amount" id="remaining_amount" value="0">
+                    </div>
+                </div>
+                <label class="mb-1"><b>Medicine</b></label>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>SN.</th>
+                        <th>Medicine Name</th>
+                        <th colspan="1">Price</th>
+                        <th>Qty</th>
+                        <th>total</th>
+                        <th>Final Amount</th>
+
+                    </tr>
+                    </thead>
+                    <tbody id="medicineTableBody">
+
+                    </tbody>
+                </table>
+                <p class="g_total"></p>
+                <input type="text" name="g_amount" id="g_amount" value="0">
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+<script>
+        var index = 1;
+        $(document).ready(function(){
+
+            {% for details in details %}
+
+                var html = '';
+                html += '<tr id="medicine_tr'+index+'">';
+                html += '<td>{{forloop.counter}}</td>';
+                html += '<td><input value="{{details.medicine_details}}" onkeyup="search_medicine('+index+');" type="text" id="medicine'+index+'" name="medicine" class="form-control" autocomplete="off"></td>';
+                html += '<input value="{{details.medicine_details.medicine_id}}" type="hidden" name="medicine_id" class="form-control" id="medicine_id'+index+'">';
+                html += '<td><input readonly value="{{details.medicine_details.price}}" type="text" id="price'+index+'" class="form-control" name="price"></td>';
+                html += '<td><input onkeyup="add_qty('+index+');" type="text" id="qty'+index+'" name="qty" class="form-control" placeholder="Enter quantity"></td>';
+                html += '<td><input value="0" type="text" id="total'+index+'" name="total" class="total form-control" readonly></td>';
+                html += '<td><input type="hidden" readonly></td>';
+                html += '</tr>';
+
+                // Append the new row to the table body
+                $('table tbody').append(html);
+                index +=1;
+            {% endfor %}
+        });
+
+        function add_medicine(){
+
+            var html = '';
+            html += '<tr id="medicine_tr'+index+'">';
+            html += '<td><input onkeyup="search_medicine('+index+');" type="text" id="medicine'+index+'" name="medicine" class="form-control" autocomplete="off" placeholder="enter medicine name"></td>';
+            html += '<input type="hidden" name="medicine_id" id="medicine_id'+index+'">';
+            html += '<td><input type="text" id="dosage'+index+'" name="dosage" class="form-control" placeholder="enter dosage as 10mg"></td>';
+            html += '<td><input type="text" id="frequency'+index+'" name="frequency" class="form-control" placeholder="enter frequency Once a day"></td>';
+            html += '</tr>';
+
+            // Append the new row to the table body
+            $('table tbody').append(html);
+            index +=1;
+        }
+
+</script>
+<script>
+    function search_medicine(indexID) {
+        $('#medicine' + indexID).autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: '/store/search-medicine/',
+                    type: 'GET',
+                    data: { search_value: request.term },
+                    success: function (result) {
+                        console.log(result.results, '----------result')
+                        if (result.results) {
+                            var suggestedProducts = result.results.map(function (results) {
+                                return {
+                                    label: results.name,
+                                    value: results.name,
+                                    id: results.id,
+                                };
+                            });
+                            response(suggestedProducts);
+                        }
+                    },
+                    error: function (xhr, errmsg, err) {
+                        // Handle the error
+                        console.log(xhr.status + ": " + xhr.responseText);
+                    }
+                });
+            },
+            select: function (event, ui) {
+                // Set the selected product details in your input fields
+                $('#medicine_id' + indexID).val(ui.item.id);
+                add_medicine()
+            }
+        });
+    }
+</script>
+
+
+<script>
+    function add_qty(index){
+        $('#total'+index).val('')
+        var qty = $('#qty'+index).val()
+        qty = parseInt(qty);
+        var price = $('#price'+index).val()
+        price = parseInt(price);
+        if (qty){
+            qty = qty
+        }else{
+            qty = 0
+        }
+        var final_price = qty * price
+        var total = $('#total'+index).val(final_price)
+
+        const nodeList = document.querySelectorAll(".total");
+        var grand_total = 0
+        for (let i = 0; i < nodeList.length; i++) {
+            var total = parseInt(nodeList[i].value)
+            grand_total  += total
+        }
+        $('.g_total').html(grand_total);
+        $('#g_amount').val(grand_total);
+    }
+</script>
+
+<script>
+$(document).ready(function() {
+    $('#submitForm').click(function() {
+        var formData = $('#patient_report_form').serialize();  // Serialize the form data
+        var bill_id = 0
+        $.ajax({
+            url: '/billing/bill_generated/'+bill_id+'/',
+            type: 'POST',
+            data: formData,
+            success: function(response) {
+                console.log(response);
+                return false;
+            },
+            error: function(error) {
+                // Handle any error
+                console.log('Error:', error);
+            }
+        });
+    });
+});
+</script>
+</body>
+</html>

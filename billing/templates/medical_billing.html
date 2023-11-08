@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Custom CSS for additional styling */
+        body {
+            background-color: #f0f0f0;
+        }
+        .invoice {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin: 10px auto;
+            padding: 20px;
+            width: 80%;
+        }
+        .invoice-header {
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .invoice-header h1 {
+            font-size: 24px;
+        }
+        .patient-info {
+            margin-bottom: 20px;
+        }
+        .patient-info p {
+            margin: 0;
+        }
+        .medicine-list {
+            margin-bottom: 20px;
+        }
+        .medicine-list h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        .medicine-table th,
+        .medicine-table td {
+            text-align: left;
+        }
+        .medicine-table th {
+            background-color: #f0f0f0;
+        }
+
+
+
+    </style>
+    <style>
+        .search-results-dropdown {
+            position: absolute;
+            z-index: 1;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .result {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .result:hover {
+            background-color: #f5f5f5;
+        }
+
+
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="invoice">
+        <div class="invoice-header text-center">
+            <h1>Patient Report</h1>
+        </div>
+        <div class="patient-info">
+            <p><strong>Patient Name:</strong> {{appoint.patient.user.full_name|title}}</p>
+            <p><strong>Age:</strong> {{appoint.patient.user.age}}</p>
+            <p><strong>Gender:</strong> {{appoint.patient.user.gender|title}}</p>
+            <p><strong>Contact:</strong> {{appoint.patient.user.mobile}}</p>
+            <p><strong>Address:</strong> {{appoint.patient.user.address}}</p>
+        </div>
+        <div class="medicine-list">
+            <div class="d-flex mx-auto">
+                <div class="m-1">
+                    <button class="btn btn-success" id="submitForm">Save</button>
+                </div>
+                <div class="m-1">
+                    <a href="/patient_report/history/{{appoint.patient_appoint_id}}/" target="_blank"
+                       class="btn btn-primary">History</a>
+                </div>
+            </div>
+            <form id="patient_report_form" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-lg-6">
+                        <label for="complaint"><b>Complaint</b></label>
+                        <textarea name="complaint" id="complaint" cols="30" rows="2" class="form-control mb-1"></textarea>
+                    </div>
+                    <div class="col-lg-6">
+                        <label for="disease"><b>Disease</b></label>
+                        <textarea name="disease" id="disease" cols="30" rows="2" class="form-control mb-1"></textarea>
+                    </div>
+                </div>
+
+                <label class="mb-1"><b>Medicine</b></label>
+                <table class="table table-bordered medicine-table">
+                    <thead>
+                    <tr>
+                        <th>Medicine Name</th>
+                        <th>Dosage</th>
+                        <th>Frequency</th>
+                    </tr>
+                    </thead>
+                    <tbody id="medicineTableBody">
+
+                    </tbody>
+                </table>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+<script>
+        var index = 1;
+        $(document).ready(function(){
+            add_medicine()
+        });
+
+        function add_medicine(){
+
+            // Get the table body element
+            const tableBody = document.getElementById('medicineTableBody');
+
+            var html = '';
+
+            html += '<tr id="medicine_tr'+index+'">';
+            html += '<td><input onkeyup="search_medicine('+index+');" type="text" id="medicine'+index+'" name="medicine" class="form-control" autocomplete="off" placeholder="enter medicine name"></td>';
+            html += '<input type="hidden" name="medicine_id" id="medicine_id'+index+'">';
+            html += '<td><input type="text" id="dosage'+index+'" name="dosage" class="form-control" placeholder="enter dosage as 10mg"></td>';
+            html += '<td><input type="text" id="frequency'+index+'" name="frequency" class="form-control" placeholder="enter frequency Once a day"></td>';
+            html += '</tr>';
+
+            // Append the new row to the table body
+            $('table tbody').append(html);
+            index +=1;
+
+        }
+
+    function search_medicine(indexID) {
+        $('#medicine' + indexID).autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: '/store/search-medicine/',
+                    type: 'GET',
+                    data: { search_value: request.term },
+                    success: function (result) {
+                        console.log(result.results, '----------result')
+                        if (result.results) {
+                            var suggestedProducts = result.results.map(function (results) {
+                                return {
+                                    label: results.name,
+                                    value: results.name,
+                                    id: results.id,
+                                };
+                            });
+                            response(suggestedProducts);
+                        }
+                    },
+                    error: function (xhr, errmsg, err) {
+                        // Handle the error
+                        console.log(xhr.status + ": " + xhr.responseText);
+                    }
+                });
+            },
+            select: function (event, ui) {
+                // Set the selected product details in your input fields
+                $('#medicine_id' + indexID).val(ui.item.id);
+                add_medicine()
+            }
+        });
+    }
+</script>
+
+<script>
+$(document).ready(function() {
+    $('#submitForm').click(function() {
+        var formData = $('#patient_report_form').serialize();  // Serialize the form data
+
+        $.ajax({
+            url: '/doctor/patient-report/'+{{appointment_id}}+'/',
+            type: 'POST',
+            data: formData,
+            success: function(response) {
+                console.log(response);
+            },
+            error: function(error) {
+                // Handle any error
+                console.log('Error:', error);
+            }
+        });
+    });
+});
+</script>
+
+
+</body>
+</html>
