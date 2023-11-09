@@ -1,5 +1,13 @@
 from django.contrib import admin
-from .models import CustomUser, HospitalUser, DoctorUser, PatientUser
+from .models import CustomUser, HospitalUser, DoctorUser, PatientUser, SocialMediaReference, OtherReference
+
+
+class SocialReferenceAdmin(admin.ModelAdmin):
+    list_display = ('id', 'type_reference', 'created_at')
+
+
+class OtherReferenceAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'created_at')
 
 
 class HospitalAdmin(admin.ModelAdmin):
@@ -18,3 +26,5 @@ admin.site.register(CustomUser)
 admin.site.register(HospitalUser, HospitalAdmin)
 admin.site.register(DoctorUser, DoctorAdmin)
 admin.site.register(PatientUser, PatientAdmin)
+admin.site.register(SocialMediaReference, SocialReferenceAdmin)
+admin.site.register(OtherReference, OtherReferenceAdmin)

@@ -28,28 +28,6 @@ class CustomUser(AbstractUser):
         return str(self.username)
 
 
-class SocialMediaReference(models.Model):
-    type_reference = models.CharField(max_length=50)
-    created_at = models.DateField(auto_now_add=True)
-
-    def __str__(self):
-        return self.type_reference
-
-    class Meta:
-        db_table = 'social_media_reference'
-
-
-class OtherReference(models.Model):
-    name = models.CharField(max_length=100)
-    created_at = models.DateField(auto_now_add=True)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        db_table = 'other_reference'
-
-
 class HospitalUser(models.Model):
     h_id = models.AutoField(primary_key=True)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
@@ -67,6 +45,32 @@ class DoctorUser(models.Model):
 
     def __str__(self):
         return str(self.user.username)
+
+
+class SocialMediaReference(models.Model):
+    type_reference = models.CharField(max_length=50)
+    hospital = models.ForeignKey(HospitalUser, related_name='social_ref_hospital', on_delete=models.CASCADE)
+    created_at = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return self.type_reference
+
+    class Meta:
+        db_table = 'social_media_reference'
+
+
+class OtherReference(models.Model):
+    hospital = models.ForeignKey(HospitalUser, related_name='other_ref_hospital', on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+    address = models.TextField(null=True, blank=True, default=None)
+    contact = models.CharField(max_length=12)
+    created_at = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        db_table = 'other_reference'
 
 
 class PatientUser(models.Model):

@@ -11,4 +11,7 @@ urlpatterns = [
     path('main_medical_store_login/', views.main_medical_store_login, name='main_medical_store_login'),
     path('mini_medical_store_login/', views.mini_medical_store_login, name='mini_medical_store_login'),
     path('user_logout/', views.user_logout, name='user_logout'),
+
+    path('add_reference/', views.add_reference, name='add_reference'),
+    path('get_patient_reference/', views.get_patient_reference, name='get_patient_reference'),
 ]

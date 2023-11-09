@@ -14,23 +14,27 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body modal-header">
-                <div class="row">
-                    <div class="col-lg-12 mb-2">
-                        <input type="text" class="form-control" name="refence_name" id="refence_name"
-                               placeholder="Enter Reference Name">
+                <form id="model_form" method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-lg-12 mb-2">
+                            <input type="text" class="form-control" name="reference_name" id="reference_name"
+                                   placeholder="Enter Reference Name">
+                        </div>
+                        <div class="col-lg-12 mb-2">
+                            <input type="text" class="form-control" name="reference_address" id="reference_address"
+                                   placeholder="Enter Reference Address">
+                        </div>
+                        <div class="col-lg-12 mb-2">
+                            <input type="text" class="form-control" name="reference_mobile" id="reference_mobile"
+                                   placeholder="Enter Reference contact Number" maxlength="10">
+                        </div>
                     </div>
-                    <div class="col-lg-12 mb-2">
-                        <input type="text" class="form-control" name="refence_address" id="refence_address"
-                               placeholder="Enter Reference Address">
-                    </div>
-                    <div class="col-lg-12 mb-2">
-                        <input type="text" class="form-control" name="refence_mobile" id="refence_mobile"
-                               placeholder="Enter Reference contact Number">
-                    </div>
-                </div>
+                </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" id="submitModelForm_close" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                <button type="button" id="submitModelForm" class="btn btn-success" data-bs-dismiss="modal">Save</button>
             </div>
         </div>
     </div>
@@ -91,28 +95,27 @@
                     <label>Reference</label>
                     <div class="col-lg-2">
                         <div class="mb-3">
-                            <select name="" id="" class="form-control">
+                            <select name="social_ref" id="social_ref" class="form-control">
                                 <option value="">Select</option>
-                                <option value="Google">Google</option>
-                                <option value="Facebook">Facebook</option>
-                                <option value="Youtube">Youtube</option>
-                                <option value="Twitter">Twitter</option>
-                                <option value="Instagram">Instagram</option>
+                                {% for social_ref in social_ref %}
+                                <option value="{{social_ref.id}}">{{social_ref.type_reference}}</option>
+                                {% endfor %}
                             </select>
                         </div>
                     </div>
                     <div class="col-lg-4">
-                        <input type="text" class="form-control" name="" id="" placeholder="patien reference">
+                        <input type="text" onkeyup="get_patient_reference()" class="form-control" name="patient_reference" id="patient_reference" placeholder="patient reference">
+                        <input type="hidden" name="patient_reference_id" id="patient_reference_id">
                     </div>
 
                     <div class="col-lg-6">
                         <div class="row">
                             <div class="col-lg-10">
-                                <select name="" id="" class="form-control">
+                                <select name="other_ref" id="other_ref" class="form-control">
                                     <option value="">Select</option>
-                                    <option value="DR Ashok">DR Ashok</option>
-                                    <option value="Kumar Medical">Kumar Medical</option>
-                                    <option value="Braj Hospital">Braj Hospital</option>
+                                    {% for other_ref in other_ref %}
+                                    <option value="{{other_ref.id}}">{{other_ref.name}}</option>
+                                    {% endfor %}
                                 </select>
                             </div>
                             <div class="col-lg-2">
@@ -157,43 +160,75 @@
 {% block js %}
 
 <script>
-    var openModalBtn = document.getElementById("openModalBtn");
-var closeModalBtn = document.getElementById("closeModalBtn");
-var modal = document.getElementById("myModal");
-var userName = document.getElementById("userName");
-var userAddress = document.getElementById("userAddress");
+    $(document).ready(function() {
+        $('#submitModelForm').click(function() {
+            var formData = $('#model_form').serialize();
+            $.ajax({
+                url: '/accounts/add_reference/',
+                type: 'POST',
+                data: formData,
+                success: function(response) {
+                    console.log(response);
+                    var obj_data = response.obj_data
+                    if (response.status == 1){
+                        var html = ''
+                        html += '<option value="'+obj_data.id+'">'+obj_data.name+'</option>'
+                        console.log(html,'===============html')
+                        $('#other_ref').append(html)
+                        $('#model_form input').val('');
+                    }
 
-// Add a click event listener to the "Open Modal" button
-openModalBtn.addEventListener("click", function () {
-  // Set the user's name and address here
-  var user = {
-    name: "John Doe",
-    address: "123 Main Street, Anytown, USA"
-  };
+                },
+                error: function(error) {
+                    // Handle any error
+                    console.log('Error:', error);
+                }
+            });
+        });
+    });
 
-  // Update the modal content with the user's information
-  userName.textContent = user.name;
-  userAddress.textContent = user.address;
+</script>
 
-  modal.style.display = "block"; // Display the modal
-});
+<script>
+    $(document).ready(function(){
+        $('#submitModelForm_close').click(function(){
+            $('#model_form input').val('');
+        })
+    })
+</script>
 
-// Add a click event listener to the "Close" button
-closeModalBtn.addEventListener("click", function () {
-  modal.style.display = "none"; // Close the modal
-});
-
-// Close the modal when the user clicks anywhere outside of it
-window.addEventListener("click", function (event) {
-  if (event.target == modal) {
-    modal.style.display = "none";
-  }
-});
-
-
-
-
-
-
+<script>
+    function get_patient_reference() {
+        $('#patient_reference').autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: '/accounts/get_patient_reference/',
+                    type: 'GET',
+                    data: { search_value: request.term },
+                    success: function (result) {
+                        console.log(result.results, '----------result')
+                        if (result.results) {
+                            var suggestedProducts = result.results.map(function (results) {
+                                return {
+                                    label: results.name,
+                                    value: results.name,
+                                    id: results.id,
+                                };
+                            });
+                            response(suggestedProducts);
+                        }
+                    },
+                    error: function (xhr, errmsg, err) {
+                        // Handle the error
+                        console.log(xhr.status + ": " + xhr.responseText);
+                    }
+                });
+            },
+            select: function (event, ui) {
+                // Set the selected product details in your input fields
+                $('#patient_reference_id').val(ui.item.id);
+            }
+        });
+    }
 </script>
 {% endblock js %}

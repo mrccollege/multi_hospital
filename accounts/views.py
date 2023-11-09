@@ -1,9 +1,11 @@
 from django.contrib.auth import authenticate, login, logout
+from django.db.models import Q
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
 
 # Create your views here.
 from store.models import MainStore, MiniStore
-from .models import CustomUser, HospitalUser, DoctorUser, PatientUser
+from .models import CustomUser, HospitalUser, DoctorUser, PatientUser, SocialMediaReference, OtherReference
 
 
 def hospital_registration(request):
@@ -94,10 +96,62 @@ def doctor_registration(request):
 
     else:
         hospital_user_id = request.session.get('hospital_user_id')
-        return render(request, 'doctor_user.html')
+        return render(request, 'doctor_registration.html')
+
+
+def add_reference(request):
+    if request.method == 'POST':
+        hospital_user_id = request.session.get('hospital_user_id')
+        h_id = HospitalUser.objects.get(user_id=hospital_user_id)
+        form = request.POST
+        reference_name = form.get('reference_name')
+        reference_address = form.get('reference_address')
+        reference_mobile = form.get('reference_mobile')
+
+        obj = OtherReference.objects.create(hospital_id=h_id.h_id,
+                                            name=reference_name,
+                                            address=reference_address,
+                                            contact=reference_mobile)
+        obj_data = {}
+        if obj:
+            status = 1
+
+            obj_data['id'] = obj.id
+            obj_data['name'] = obj.name
+        else:
+            status = 0
+
+        context = {
+            'status': status,
+            'obj_data': obj_data,
+        }
+        return JsonResponse(context)
+
+
+def get_patient_reference(request):
+    hospital_user_id = request.session.get('hospital_user_id')
+    h_id = HospitalUser.objects.get(user_id=hospital_user_id)
+    if request.method == 'GET':
+        form = request.GET
+        search_value = form.get('search_value')
+        patient = PatientUser.objects.filter(Q(hospital_id=h_id.h_id),
+                                             Q(user__full_name__icontains=search_value)
+                                             )
+        patient_list = []
+        for i in patient:
+            data_dict = {}
+            data_dict['id'] = i.p_id
+            data_dict['name'] = i.user.full_name
+            patient_list.append(data_dict)
+        context = {
+            'results': patient_list,
+        }
+        return JsonResponse(context)
 
 
 def patient_registration(request):
+    hospital_user_id = request.session.get('hospital_user_id')
+    h_id = HospitalUser.objects.get(user_id=hospital_user_id)
     if request.method == 'POST':
         form = request.POST
         full_name = form.get('patientName')
@@ -110,6 +164,25 @@ def patient_registration(request):
         address = address.title()
         mobile = form.get('contactNumber')
         user_type = 'PATIENT'
+        social_ref = form.get('social_ref')
+        other_ref = form.get('other_ref')
+        patient_ref = form.get('patient_reference_id')
+
+        if social_ref:
+            social_ref = social_ref
+        else:
+            social_ref = None
+
+        if other_ref:
+            other_ref = other_ref
+        else:
+            other_ref = None
+
+        if patient_ref:
+            patient_ref = patient_ref
+        else:
+            patient_ref = None
+
         user = CustomUser.objects.create_user(full_name=full_name,
                                               username=email,
                                               age=age,
@@ -121,13 +194,22 @@ def patient_registration(request):
                                               user_type=user_type,
                                               )
         if user:
-            hospital_user_id = request.session.get('hospital_user_id')
-            h_id = HospitalUser.objects.get(user_id=hospital_user_id)
-            patient = PatientUser.objects.create(user_id=user.id, hospital_id=h_id.h_id)
+            patient = PatientUser.objects.create(user_id=user.id,
+                                                 hospital_id=h_id.h_id,
+                                                 social_ref_id=social_ref,
+                                                 other_ref_id=other_ref,
+                                                 patient_ref=patient_ref,  #patient user id
+                                                 )
             if patient:
                 return redirect('/')
-
-    return render(request, 'patient_user.html')
+    else:
+        social_ref = SocialMediaReference.objects.filter(hospital_id=h_id.h_id)
+        other_ref = OtherReference.objects.filter(hospital_id=h_id.h_id)
+        context = {
+            'social_ref': social_ref,
+            'other_ref': other_ref,
+        }
+        return render(request, 'patient_registration.html', context)
 
 
 def main_medical_store_registration(request):
@@ -177,6 +259,7 @@ def main_medical_store_login(request):
         else:
             error_message = "Invalid username or password"
     return render(request, 'main_medical_store_login.html')
+
 
 def mini_medical_store_registration(request):
     if request.method == 'POST':
