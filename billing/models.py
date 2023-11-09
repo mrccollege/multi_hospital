@@ -19,6 +19,7 @@ class PatientBillHistory(models.Model):
     online = models.IntegerField(default=0)
     remaining = models.IntegerField(default=0)
     created_at = models.DateField(auto_now_add=True)
+    updated_at = models.DateField(null=True)
 
     class Meta:
         db_table = 'Patient_bill_history'
