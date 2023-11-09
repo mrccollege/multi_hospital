@@ -9,16 +9,30 @@
         <div class="col-md-6">
             <h2 class="mb-4">Medicine Registration</h2>
             <form method="post">{% csrf_token %}
-                <div class="mb-3">
-                    <label for="medicineName" class="form-label">Medicine Name</label>
-                    <input type="text" class="form-control" name="medicineName" id="medicineName"
-                           placeholder="Enter medicine Name"
-                           required>
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="mb-3">
+                            <label for="medicineName" class="form-label">Medicine Name</label>
+                            <input type="text" class="form-control" name="medicineName" id="medicineName"
+                                   placeholder="Enter medicine Name"
+                                   required>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <div class="mb-3">
+                            <label for="batch_no" class="form-label">batch_no</label>
+                            <input type="text" class="form-control" name="batch_no" id="batch_no"
+                                   placeholder="Enter Batch Number"
+                                   required>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="mb-3">
                     <label for="description" class="form-label">Medicine Description</label>
-                    <textarea class="w-100" name="description" id="description" rows="3" placeholder="Enter description"></textarea>
+                    <textarea class="w-100" name="description" id="description" rows="3"
+                              placeholder="Enter description"></textarea>
                 </div>
 
 

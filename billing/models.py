@@ -1,11 +1,12 @@
 from django.db import models
 
+
 # Create your models here.
-from accounts.models import PatientUser
-from store.models import Medicine
+from patient_report.models import HeaderPatient
 
 
 class PatientBillHistory(models.Model):
+    header_patient = models.ForeignKey(HeaderPatient, on_delete=models.CASCADE)
     medicine = models.CharField(max_length=1000)
     qty = models.CharField(max_length=1000)
     price = models.CharField(max_length=1000)

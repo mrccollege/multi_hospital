@@ -9,63 +9,40 @@ from billing.models import PatientBillHistory
 from patient_report.models import HeaderPatient, DetailsPatient
 from store.models import MiniStore
 
-
-def mini_store_login(request):
-    if request.method == 'POST':
-        form = request.POST
-        username = form.get('email')
-        password = form.get('password')
-
-        username = username.strip()
-        username = 'MRC Mini Store'
-        password = password.strip()
-        try:
-            user = CustomUser.objects.filter(username=username).first()
-        except Exception as e:
-            print(e, '===========e==========')
-            user = None
-        if user is not None:
-            if user.user_type == 'MINI_MEDICAL_STORE':
-                user = authenticate(username=username, password=password)
-                login(request, user)
-                request.session['mini_medical_user_id'] = user.id
-                return redirect('/billing/')
-        else:
-            error_message = "Invalid username or password"
-    return render(request, 'mini_medical_store_login.html')
-
-
 def mini_store_logout(request):
     logout(request)
-    return redirect('/billing/login/')
+    return redirect('/accounts/mini_medical_store_login/')
 
 
-@login_required(login_url='/billing/login/')
+@login_required(login_url='/accounts/mini_medical_store_login/')
 def patient_billing_list(request):
     mini_medical_user_id = request.session['mini_medical_user_id']
     mini_medical_details = MiniStore.objects.get(mini_store_user_id=mini_medical_user_id)
     hospital_id = mini_medical_details.hospital_id
-    patient_bill = HeaderPatient.objects.filter(appointment__hospital_id=hospital_id)
+    patient_bill = HeaderPatient.objects.filter(appointment__hospital_id=hospital_id, status='unbilled')
     context = {
         'patient_bill': patient_bill,
     }
     return render(request, 'patient_billing_list.html', context)
 
 
-def generate_bill(request, id):
-    details = DetailsPatient.objects.filter(header_id=id)
-    header = HeaderPatient.objects.get(head_id=id)
+def generate_bill(request, head_id):
+    header = HeaderPatient.objects.get(head_id=head_id)
+    details = DetailsPatient.objects.filter(header_id=head_id)
     context = {
+        'head_id': head_id,
         'header': header,
         'details': details,
     }
-    return render(request, 'generate_bill.html', context)
+    # return render(request, 'generate_bill.html', context)
+    return render(request, 'generate_bill1.html', context)
 
 
-def bill_generated(request, id=0):
+def generated_bill(request, id=0):
     if request.method == 'POST':
         form = request.POST
         medicine_ids = form.getlist('medicine_id')
+        head_id = form.get('head_id')
         patient_id = form.get('patient_id')
         hospital_id = form.get('hospital_id')
         doctor_id = form.get('doctor_id')
@@ -76,7 +53,8 @@ def bill_generated(request, id=0):
         remaining_amount = form.get('remaining_amount')
         g_amount = form.get('g_amount')
         if id == 0:
-            history = PatientBillHistory.objects.create(medicine=medicine_ids,
+            history = PatientBillHistory.objects.create(header_patient_id=head_id,
+                                                        medicine=medicine_ids,
                                                         qty=qty,
                                                         price=price,
                                                         patient=patient_id,
@@ -88,7 +66,9 @@ def bill_generated(request, id=0):
                                                         remaining=remaining_amount,
                                                         )
             if history:
-                msg = 'Bill Successfully Generated'
+                header = HeaderPatient.objects.filter(head_id=head_id).update(status='billed')
+                if header:
+                    msg = 'Bill Successfully Generated'
             else:
                 msg = 'Bill Generated Failed!'
         else:

@@ -18,7 +18,7 @@
             <select name="mini_stores_list" id="mini_stores_list" class="form-control" onchange="get_mini_store_records()">
                 <option value="">Select Mini Stores</option>
                 {% for mini_store in mini_store %}
-                <option value="{{mini_store.mini_store_id}}">{{mini_store.mini_store_user}}</option>
+                <option value="{{mini_store.mini_store_id}}">{{mini_store.mini_store_user.full_name}}</option>
                 {% endfor %}
             </select>
         </div>
@@ -27,23 +27,23 @@
         <thead>
         <tr>
             <th>Name</th>
+            <th>Batch No.</th>
             <th>Qty</th>
             <th>Price</th>
             <th>Expiration</th>
             <th>Hospital</th>
-            <th>Action</th>
         </tr>
         </thead>
         <tbody>
         {% if medicine %}
             {% for medicine in medicine %}
             <tr>
-                <td>{{ medicine.medicine }}</td>
+                <td>{{ medicine.medicine.name }}</td>
+                <td>{{ medicine.medicine.batch_no }}</td>
                 <td>{{ medicine.mini_qty }}</td>
-                <td>{{ medicine.medicine.medicine.price }}</td>
-                <td>{{ medicine.medicine.medicine.expiration }}</td>
-                <td>{{ medicine.medicine.medicine.hospital }}</td>
-                <td><a href="http://">update</a></td>
+                <td>{{ medicine.medicine.price }}</td>
+                <td>{{ medicine.medicine.expiration }}</td>
+                <td>{{ medicine.medicine.main_store.hospital.user.full_name }}</td>
             </tr>
             {% endfor %}
         {% endif %}

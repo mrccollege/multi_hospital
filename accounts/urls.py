@@ -8,5 +8,7 @@ urlpatterns = [
     path('main_medical_store_registration/', views.main_medical_store_registration, name='main_medical_store_registration'),
     path('mini_medical_store_registration/', views.mini_medical_store_registration, name='mini_medical_store_registration'),
     path('hospital-login/', views.hospital_login, name='hospital_login'),
+    path('main_medical_store_login/', views.main_medical_store_login, name='main_medical_store_login'),
+    path('mini_medical_store_login/', views.mini_medical_store_login, name='mini_medical_store_login'),
     path('user_logout/', views.user_logout, name='user_logout'),
 ]

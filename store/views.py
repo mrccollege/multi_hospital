@@ -1,31 +1,35 @@
+from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 
 from accounts.models import HospitalUser
-from .models import Medicine, MappingMedicine, MainStore, MainMedicalStoreMedicineTransactionHistory, MiniStore, \
+from .models import Medicine, MainStore, MainMedicalStoreMedicineTransactionHistory, MiniStore, \
     MappingMiniStorMedicine
 
 
 # Create your views here.
-def add_medicine(request):
+def add_medicine(request, main_store_id):
     if request.method == 'POST':
-        hospital_user_id = request.session.get('hospital_user_id')
-        h_id = HospitalUser.objects.get(user_id=hospital_user_id)
         form = request.POST
+        batch_no = form.get('batch_no')
         medicine_name = form.get('medicineName')
         description = form.get('description')
         price = form.get('price')
+        quantity = form.get('quantity')
         expiration = form.get('expiration_date')
         manufacturer = form.get('manufacturer')
+        manufacturer = manufacturer.title()
         medicine = Medicine.objects.create(name=medicine_name,
+                                           batch_no=batch_no,
                                            description=description,
                                            price=price,
+                                           qty=quantity,
                                            manufacturer=manufacturer,
                                            expiration=expiration,
-                                           hospital_id=h_id.h_id,
+                                           main_store_id=main_store_id,
                                            )
         if medicine:
-            return redirect('/store/add_medicine/')
+            return redirect(f'/store/add_medicine/{main_store_id}/')
     else:
         return render(request, 'add_medicine.html')
 
@@ -34,12 +38,15 @@ def search_medicine(request):
     if request.method == 'GET':
         form = request.GET
         search_value = form.get('search_value')
-        medicine = MappingMedicine.objects.filter(medicine__name__icontains=search_value)
+        medicine = Medicine.objects.filter(Q(name__icontains=search_value) |
+                                           Q(batch_no__icontains=search_value))
         data_list = []
         for i in medicine:
             data_dict = {}
-            data_dict['id'] = i.mapping_id
-            data_dict['name'] = i.medicine.name.capitalize()
+            data_dict['id'] = i.medicine_id
+            data_dict['name'] = i.name.capitalize()
+            data_dict['batch_no'] = i.batch_no if i.batch_no else ''
+            data_dict['price'] = i.price
             data_list.append(data_dict)
 
         context = {
@@ -80,10 +87,10 @@ def mapping_medicine(request):
         qty = form.getlist('qty')
         for i in range(len(medicine_ids)):
             if medicine_ids[i] != '' and qty[i]:
-                obj = MappingMedicine.objects.create(medicine_id=medicine_ids[i],
-                                                     main_qty=qty[i],
-                                                     main_store_user_id=main_store_id,
-                                                     )
+                obj = Medicine.objects.create(medicine_id=medicine_ids[i],
+                                              main_qty=qty[i],
+                                              main_store_user_id=main_store_id,
+                                              )
                 if obj:
                     main_medicine_transaction(obj.mapping_id, qty[i])
             else:
@@ -110,42 +117,41 @@ def main_medicine_transaction(mapping_id, qty):
                                                               )
 
 
-def view_main_store(request, main_store_id):
-    if request.method == 'GET':
-        medicine = MappingMedicine.objects.filter(main_store_user_id=main_store_id)
-        hospital_id = medicine[0].main_store_user.hospital.h_id
-        mini_store = MiniStore.objects.all()
-        if medicine:
-            context = {
-                'hospital_id': hospital_id,
-                'main_store_id': main_store_id,
-                'medicine': medicine,
-                'mini_store': mini_store,
-            }
-            return render(request, 'view_main_store.html', context)
-        else:
-            return redirect('/store/mapping-medicine/')
+def main_medical_store_dashboard(request):
+    main_medical_user_id = request.session.get('main_medical_user_id')
+    if main_medical_user_id is None:
+        return redirect('/accounts/main_medical_store_login/')
+    else:
+        main_medical_store = MainStore.objects.get(main_store_user_id=main_medical_user_id)
+        main_medical_store_id = main_medical_store.main_store_id
+        medicine = Medicine.objects.filter(main_store_id=main_medical_store_id)
 
-def view_mini_stores_record(request, mini_store_id, hospital_id):
-    if request.method == 'GET':
-        medicine = MappingMiniStorMedicine.objects.filter(mini_store_user_id=mini_store_id)
-        mini_store = MiniStore.objects.filter(hospital_id=hospital_id)
-        if medicine:
-            context = {
-                'hospital_id': hospital_id,
-                'mini_store_id': mini_store_id,
-                'mini_store': mini_store,
-                'medicine': medicine,
-            }
-            return render(request, 'mini_store_record.html', context)
-        else:
-            context = {
-                'hospital_id': hospital_id,
-                'mini_store_id': mini_store_id,
-                'mini_store': mini_store,
-                'medicine': medicine,
-            }
-            return render(request, 'mini_store_record.html', context)
+        mini_stores = MiniStore.objects.filter(hospital_id=main_medical_store.hospital_id)
+        context = {
+            'main_store_id': main_medical_store_id,
+            'main_medical_store': main_medical_store,
+            'medicine': medicine,
+            'mini_stores': mini_stores,
+            'hospital_id': main_medical_store.hospital_id
+        }
+        return render(request, 'main_medical_store_dashboard.html', context)
+
+
+def mini_medical_store_dashboard(request):
+    mini_medical_user_id = request.session.get('mini_medical_user_id')
+    if mini_medical_user_id is None:
+        return redirect('/accounts/mini_medical_store_login/')
+    else:
+        mini_medical_store = MiniStore.objects.get(mini_store_user_id=mini_medical_user_id)
+        mini_medical_store_id = mini_medical_store.mini_store_id
+        medicine = MappingMiniStorMedicine.objects.filter(mini_store_user_id=mini_medical_store_id)
+        print(medicine, '==========medicine')
+        context = {
+            'mini_medical_store_id': mini_medical_store_id,
+            'mini_medical_store': mini_medical_store,
+            'medicine': medicine,
+        }
+        return render(request, 'mini_medical_store_dashboard.html', context)
 
 
 def get_mini_store_model_data(request):
@@ -198,11 +204,10 @@ def transfer_medicine_to_mini_store(request):
                                                          mini_store_user_id=mini_store_id
                                                          )
         if obj:
-            medicine = MappingMedicine.objects.filter(mapping_id=medicine_id, main_store_user_id=main_store_id)
+            medicine = Medicine.objects.filter(medicine_id=medicine_id, main_store_id=main_store_id)
             if medicine:
-                medicine = medicine[0].main_qty
-            obj = MappingMedicine.objects.filter(mapping_id=medicine_id, main_store_user_id=main_store_id).update(
-                main_qty=int(medicine) - int(medicine_qty))
+                medicine = medicine[0].qty
+            obj = Medicine.objects.filter(medicine_id=medicine_id, main_store_id=main_store_id).update(qty=int(medicine) - int(medicine_qty))
             if obj:
                 status = 1
                 msg = 'medicine transfer to mini store successfully.'
@@ -213,3 +218,26 @@ def transfer_medicine_to_mini_store(request):
                 'msg': msg
             }
             return JsonResponse(context)
+
+
+def view_mini_stores_record(request, mini_store_id, hospital_id):
+    if request.method == 'GET':
+        medicine = MappingMiniStorMedicine.objects.filter(mini_store_user_id=mini_store_id)
+        mini_store = MiniStore.objects.filter(hospital_id=hospital_id)
+
+        if medicine:
+            context = {
+                'hospital_id': hospital_id,
+                'mini_store_id': mini_store_id,
+                'mini_store': mini_store,
+                'medicine': medicine,
+            }
+            return render(request, 'mini_store_record.html', context)
+        else:
+            context = {
+                'hospital_id': hospital_id,
+                'mini_store_id': mini_store_id,
+                'mini_store': mini_store,
+                'medicine': medicine,
+            }
+            return render(request, 'mini_store_record.html', context)

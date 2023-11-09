@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import MiniStore, MainStore, Medicine, MappingMedicine, MappingMiniStorMedicine, \
+from .models import MiniStore, MainStore, Medicine, MappingMiniStorMedicine, \
     MainMedicalStoreMedicineTransactionHistory
 
 
@@ -13,11 +13,7 @@ class MiniStoreAdmin(admin.ModelAdmin):
 
 
 class MedicineAdmin(admin.ModelAdmin):
-    list_display = ['medicine_id', 'name', 'description', 'price', 'expiration', 'manufacturer', 'hospital']
-
-
-class MappingMedicineAdmin(admin.ModelAdmin):
-    list_display = ['mapping_id', 'main_qty', 'medicine', 'main_store_user', ]
+    list_display = ['medicine_id', 'name', 'description', 'price', 'expiration', 'manufacturer', 'main_store']
 
 
 class MappingMiniStorMedicineAdmin(admin.ModelAdmin):
@@ -27,6 +23,5 @@ class MappingMiniStorMedicineAdmin(admin.ModelAdmin):
 admin.site.register(MainStore, MainStoreAdmin)
 admin.site.register(MiniStore, MiniStoreAdmin)
 admin.site.register(Medicine, MedicineAdmin)
-admin.site.register(MappingMedicine, MappingMedicineAdmin)
 admin.site.register(MappingMiniStorMedicine, MappingMiniStorMedicineAdmin)
 admin.site.register(MainMedicalStoreMedicineTransactionHistory)

@@ -8,10 +8,14 @@ class HeaderPatient(models.Model):
     head_id = models.AutoField(primary_key=True)
     appointment = models.ForeignKey(PatientAppointment, on_delete=models.CASCADE)
     disease = models.TextField(null=True, blank=True)
+    status = models.CharField(max_length=10, default='unbilled')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return str(self.appointment.patient.user.full_name)
+
+    class Meta:
+        db_table = 'header_patient'
 
 
 class DetailsPatient(models.Model):
@@ -25,3 +29,6 @@ class DetailsPatient(models.Model):
 
     def __str__(self):
         return str(self.header.appointment.patient.user.full_name)
+
+    class Meta:
+        db_table = 'details_patient'

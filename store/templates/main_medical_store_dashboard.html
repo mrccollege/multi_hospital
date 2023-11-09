@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Django DataTable Example</title>
+    <title>Main Medical Store</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" rel="stylesheet">
 </head>
@@ -36,18 +36,19 @@
         </div>
     </div>
 </div>
+
 <div class="container mt-4">
     <div class="row">
         <div class="col-lg-6">
-            <h2>Sample DataTable</h2>
-
+            <h2>{{main_medical_store.main_store_user.full_name}}</h2>
+            <a href="/store/add_medicine/{{main_store_id}}/" target="_blank" class="btn btn-primary" id="add_medicine">Add Medicine</a>
         </div>
         <div class="col-lg-6">
-            <label for="">view mini store Records</label>
+            <label>view mini store Records</label>
             <select name="mini_stores_list" id="mini_stores_list" class="form-control" onchange="get_mini_store_records()">
                 <option value="">Select Mini Stores</option>
-                {% for mini_store in mini_store %}
-                <option value="{{mini_store.mini_store_id}}">{{mini_store.mini_store_user}}</option>
+                {% for mini_stores in mini_stores %}
+                <option value="{{mini_stores.mini_store_id}}">{{mini_stores.mini_store_user.full_name}}</option>
                 {% endfor %}
             </select>
         </div>
@@ -56,6 +57,7 @@
         <thead>
         <tr>
             <th>Name</th>
+            <th>Batch No.</th>
             <th>Qty</th>
             <th>Price</th>
             <th>Expiration</th>
@@ -66,14 +68,15 @@
         <tbody>
         {% for medicine in medicine %}
         <tr>
-            <td>{{ medicine.medicine.name }}</td>
-            <td>{{ medicine.main_qty }}</td>
-            <td>{{ medicine.medicine.price }}</td>
-            <td>{{ medicine.medicine.expiration }}</td>
-            <td>{{ medicine.medicine.hospital }}</td>
+            <td>{{ medicine.name }}</td>
+            <td>{{ medicine.batch_no }}</td>
+            <td>{{ medicine.qty }}</td>
+            <td>{{ medicine.price }}</td>
+            <td>{{ medicine.expiration }}</td>
+            <td>{{ medicine.main_store.hospital.user.full_name }}</td>
             <td>
                 <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                        onclick="transfer_medicine('{{medicine.mapping_id}}')" data-bs-target="#userInfoModal">Transfer
+                        onclick="transfer_medicine('{{medicine.medicine_id}}')" data-bs-target="#userInfoModal">Transfer
                 </button>
             </td>
 
@@ -96,7 +99,6 @@
 
 <script>
     function transfer_medicine(medicine_id) {
-        alert(medicine_id)
         $.ajax({
             url: '/store/get_mini_store_model_data/',
             type: 'GET',

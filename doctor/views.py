@@ -61,11 +61,8 @@ def patient_report(request, appointment_id):
         medicine_id = form.getlist('medicine_id')
         dosage = form.getlist('dosage')
         frequency = form.getlist('frequency')
-        print(disease, '===============disease')
-        print(medicine_id, '===============medicine_id')
-
         head = HeaderPatient.objects.create(appointment_id=appointment_id,
-                                            disease=disease,
+                                            disease=[disease],
                                             )
         if head:
             for i in range(len(medicine_id)):
