@@ -22,7 +22,7 @@ class CustomUser(AbstractUser):
     created_at = models.DateField(auto_now_add=True)
 
     class Meta:
-        db_table = 'user'
+        db_table = 'custom_user'
 
     def __str__(self):
         return str(self.username)
