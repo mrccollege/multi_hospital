@@ -84,7 +84,7 @@ DATABASES = {
         'USER': 'mrc_hospi',
         'PASSWORD': 'Hello123456#',
         'HOST': '178.16.139.173',
-        'PORT': '3306',
+        'PORT': '22',
     }
 }
 
