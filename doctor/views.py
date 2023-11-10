@@ -10,7 +10,12 @@ from patient_report.models import HeaderPatient, DetailsPatient
 
 @login_required(login_url='/doctor/login/')
 def doctor_dashboard(request):
-    doctor_user_id = request.session['doctor_user_id']
+    doctor_user_id = ''
+    try:
+        doctor_user_id = request.session['doctor_user_id']
+    except Exception as e:
+        print(e, '========e=========')
+
     if doctor_user_id:
         doctor_details = DoctorUser.objects.get(user_id=doctor_user_id)
         appoint = PatientAppointment.objects.filter(doctor__user_id=doctor_user_id)

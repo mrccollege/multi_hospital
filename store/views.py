@@ -4,7 +4,14 @@ from django.shortcuts import render, redirect
 
 from accounts.models import HospitalUser
 from .models import Medicine, MainStore, MainMedicalStoreMedicineTransactionHistory, MiniStore, \
-    MappingMiniStorMedicine
+    MappingMiniStorMedicine, MiniMedicalStoreMedicineTransactionHistory
+
+
+def main_medicine_transaction(mapping_id, qty, main_store_id):
+    MainMedicalStoreMedicineTransactionHistory.objects.create(medicine_id=mapping_id,
+                                                              trans_qty=qty,
+                                                              main_store_id=main_store_id,
+                                                              )
 
 
 # Create your views here.
@@ -12,6 +19,7 @@ def add_medicine(request, main_store_id):
     if request.method == 'POST':
         form = request.POST
         batch_no = form.get('batch_no')
+        batch_no = batch_no.upper()
         medicine_name = form.get('medicineName')
         description = form.get('description')
         price = form.get('price')
@@ -29,6 +37,7 @@ def add_medicine(request, main_store_id):
                                            main_store_id=main_store_id,
                                            )
         if medicine:
+            main_medicine_transaction(medicine.medicine_id, quantity, main_store_id)
             return redirect(f'/store/add_medicine/{main_store_id}/')
     else:
         return render(request, 'add_medicine.html')
@@ -74,47 +83,6 @@ def transfer_search_medicine(request):
             'results': data_list,
         }
         return JsonResponse(context)
-
-
-def mapping_medicine(request):
-    if request.method == 'POST':
-        hospital_user_id = request.session.get('hospital_user_id')
-        h_id = HospitalUser.objects.get(user_id=hospital_user_id)
-        main_store = MainStore.objects.get(hospital_id=h_id.h_id)
-        main_store_id = main_store.main_store_id
-        form = request.POST
-        medicine_ids = form.getlist('medicine_id')
-        qty = form.getlist('qty')
-        for i in range(len(medicine_ids)):
-            if medicine_ids[i] != '' and qty[i]:
-                obj = Medicine.objects.create(medicine_id=medicine_ids[i],
-                                              main_qty=qty[i],
-                                              main_store_user_id=main_store_id,
-                                              )
-                if obj:
-                    main_medicine_transaction(obj.mapping_id, qty[i])
-            else:
-                print(medicine_ids[i], '===============medicine_ids[i]')
-                print(qty[i], '===============qty[i]')
-        return redirect('/store/mapping-medicine/')
-    else:
-        hospital_user_id = request.session.get('hospital_user_id')
-        h_id = HospitalUser.objects.get(user_id=hospital_user_id)
-        main_store = MainStore.objects.filter(hospital_id=h_id.h_id)
-        if main_store:
-            main_store_id = main_store[0].main_store_id
-        else:
-            return redirect('/accounts/main_medical_store_registration/')
-        context = {
-            'main_store_id': main_store_id
-        }
-        return render(request, 'transfer_medicine_to_main.html', context)
-
-
-def main_medicine_transaction(mapping_id, qty):
-    MainMedicalStoreMedicineTransactionHistory.objects.create(mapping_medicine_id=mapping_id,
-                                                              trans_qty=qty,
-                                                              )
 
 
 def main_medical_store_dashboard(request):
@@ -180,6 +148,12 @@ def get_mini_store_model_data(request):
         return JsonResponse(context)
 
 
+def mini_medical_store_transaction_hist(medicine_id, main_store_id, medicine_qty):
+    MiniMedicalStoreMedicineTransactionHistory.objects.create(medicine_id=medicine_id,
+                                                              main_store_id=main_store_id,
+                                                              trans_qty=medicine_qty)
+
+
 def transfer_medicine_to_mini_store(request):
     if request.method == 'GET':
         form = request.GET
@@ -204,10 +178,13 @@ def transfer_medicine_to_mini_store(request):
                                                          mini_store_user_id=mini_store_id
                                                          )
         if obj:
+            mini_medical_store_transaction_hist(medicine_id, main_store_id, medicine_qty)
+
             medicine = Medicine.objects.filter(medicine_id=medicine_id, main_store_id=main_store_id)
             if medicine:
                 medicine = medicine[0].qty
-            obj = Medicine.objects.filter(medicine_id=medicine_id, main_store_id=main_store_id).update(qty=int(medicine) - int(medicine_qty))
+                qty = int(medicine) - int(medicine_qty)
+            obj = Medicine.objects.filter(medicine_id=medicine_id, main_store_id=main_store_id).update(qty=qty)
             if obj:
                 status = 1
                 msg = 'medicine transfer to mini store successfully.'

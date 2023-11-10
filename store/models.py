@@ -46,6 +46,21 @@ class Medicine(models.Model):
         db_table = 'main_store_medicine'
 
 
+class MainMedicalStoreMedicineTransactionHistory(models.Model):
+    medicine_trans_id = models.AutoField(primary_key=True)
+    medicine = models.ForeignKey(Medicine, on_delete=models.CASCADE)
+    main_store = models.ForeignKey(MainStore, related_name='main_trans_main_store_user', on_delete=models.CASCADE)
+    trans_qty = models.IntegerField()
+    trans_created = models.DateField(auto_now_add=True)
+    trans_update = models.DateField(null=True)
+
+    def __str__(self):
+        return str(self.medicine.name)
+
+    class Meta:
+        db_table = 'main_store_medicine_transaction_history'
+
+
 class MappingMiniStorMedicine(models.Model):
     mapping_id = models.AutoField(primary_key=True)
     mini_qty = models.IntegerField()
@@ -59,15 +74,16 @@ class MappingMiniStorMedicine(models.Model):
         db_table = 'mapping_mini_store_medicine'
 
 
-class MainMedicalStoreMedicineTransactionHistory(models.Model):
+class MiniMedicalStoreMedicineTransactionHistory(models.Model):
     medicine_trans_id = models.AutoField(primary_key=True)
-    mapping_medicine = models.ForeignKey(Medicine, on_delete=models.CASCADE)
+    medicine = models.ForeignKey(Medicine, on_delete=models.CASCADE)
+    main_store = models.ForeignKey(MainStore, related_name='mini_trans_main_store_user', on_delete=models.CASCADE)
     trans_qty = models.IntegerField()
     trans_created = models.DateField(auto_now_add=True)
     trans_update = models.DateField(null=True)
 
     def __str__(self):
-        return str(self.mapping_medicine.medicine.name)
+        return str(self.medicine.name)
 
     class Meta:
-        db_table = 'main_store_medicine_transaction_history'
+        db_table = 'mini_store_medicine_transaction_history'

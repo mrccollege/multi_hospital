@@ -182,7 +182,9 @@ def patient_registration(request):
             patient_ref = patient_ref
         else:
             patient_ref = None
-
+        print(other_ref, '==============================================other_ref')
+        print(social_ref, '==============================================social_ref')
+        print(patient_ref, '==============================================patient')
         user = CustomUser.objects.create_user(full_name=full_name,
                                               username=email,
                                               age=age,
@@ -198,7 +200,7 @@ def patient_registration(request):
                                                  hospital_id=h_id.h_id,
                                                  social_ref_id=social_ref,
                                                  other_ref_id=other_ref,
-                                                 patient_ref=patient_ref,  #patient user id
+                                                 patient_ref=patient_ref,
                                                  )
             if patient:
                 return redirect('/')

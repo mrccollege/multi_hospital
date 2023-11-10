@@ -77,8 +77,8 @@ class PatientUser(models.Model):
     p_id = models.AutoField(primary_key=True)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     hospital = models.ForeignKey(HospitalUser, on_delete=models.CASCADE)
-    social_ref = models.ForeignKey(SocialMediaReference, on_delete=models.CASCADE, default=None)
-    other_ref = models.ForeignKey(OtherReference, on_delete=models.CASCADE, default=None)
+    social_ref = models.ForeignKey(SocialMediaReference, on_delete=models.CASCADE, null=True, blank=True, default=None)
+    other_ref = models.ForeignKey(OtherReference, on_delete=models.CASCADE, null=True, blank=True, default=None)
     patient_ref = models.IntegerField(null=True, default=None)
     created_at = models.DateField(auto_now_add=True)
 

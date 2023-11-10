@@ -13,7 +13,7 @@ SECRET_KEY = 'django-insecure-_4=$=(q&*=n@tdfc@j$zx-5gizfzil$h9q!zy4m*69-7)z@bf-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*', 'www.mrccollege.in', 'mrccollege.in']
+ALLOWED_HOSTS = ['*', 'www.mrccollege.in', 'mrccollege.in', 'liveserver.site', 'www.liveserver.site']
 
 
 # Application definition
@@ -69,24 +69,24 @@ WSGI_APPLICATION = 'multi_hospital_project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'multi_hospi',
-        'USER': 'multi_hospi',
-        'PASSWORD': 'qwerty123',
-        'HOST': 'localhost',
-        'PORT': '3306',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'multi_hospi',
+#         'USER': 'multi_hospi',
+#         'PASSWORD': 'qwerty123',
+#         'HOST': 'localhost',
+#         'PORT': '3306',
+#     }
+# }
 
 
 # Password validation

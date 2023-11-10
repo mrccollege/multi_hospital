@@ -10,12 +10,13 @@
 <div class="container mt-4">
     <div class="row">
         <div class="col-lg-6">
-            <h2>Sample DataTable</h2>
+            <h2>Mini Store Records</h2>
 
         </div>
         <div class="col-lg-6">
-            <label for="">view mini store Records</label>
-            <select name="mini_stores_list" id="mini_stores_list" class="form-control" onchange="get_mini_store_records()">
+            <label>view mini store Records</label>
+            <select name="mini_stores_list" id="mini_stores_list" class="form-control"
+                    onchange="get_mini_store_records()">
                 <option value="">Select Mini Stores</option>
                 {% for mini_store in mini_store %}
                 <option value="{{mini_store.mini_store_id}}">{{mini_store.mini_store_user.full_name}}</option>
@@ -36,16 +37,16 @@
         </thead>
         <tbody>
         {% if medicine %}
-            {% for medicine in medicine %}
-            <tr>
-                <td>{{ medicine.medicine.name }}</td>
-                <td>{{ medicine.medicine.batch_no }}</td>
-                <td>{{ medicine.mini_qty }}</td>
-                <td>{{ medicine.medicine.price }}</td>
-                <td>{{ medicine.medicine.expiration }}</td>
-                <td>{{ medicine.medicine.main_store.hospital.user.full_name }}</td>
-            </tr>
-            {% endfor %}
+        {% for medicine in medicine %}
+        <tr>
+            <td>{{ medicine.medicine.name }}</td>
+            <td>{{ medicine.medicine.batch_no }}</td>
+            <td>{{ medicine.mini_qty }}</td>
+            <td>{{ medicine.medicine.price }}</td>
+            <td>{{ medicine.medicine.expiration }}</td>
+            <td>{{ medicine.medicine.main_store.hospital.user.full_name }}</td>
+        </tr>
+        {% endfor %}
         {% endif %}
         </tbody>
     </table>

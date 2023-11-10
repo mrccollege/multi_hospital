@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import MiniStore, MainStore, Medicine, MappingMiniStorMedicine, \
-    MainMedicalStoreMedicineTransactionHistory
+    MainMedicalStoreMedicineTransactionHistory, MiniMedicalStoreMedicineTransactionHistory
 
 
 # Register your models here.
@@ -25,3 +25,4 @@ admin.site.register(MiniStore, MiniStoreAdmin)
 admin.site.register(Medicine, MedicineAdmin)
 admin.site.register(MappingMiniStorMedicine, MappingMiniStorMedicineAdmin)
 admin.site.register(MainMedicalStoreMedicineTransactionHistory)
+admin.site.register(MiniMedicalStoreMedicineTransactionHistory)
