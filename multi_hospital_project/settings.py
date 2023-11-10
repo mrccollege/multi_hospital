@@ -83,7 +83,7 @@ DATABASES = {
         'NAME': 'multi_hospi',
         'USER': "'multi_hospi'@'178.16.139.173'",
         'PASSWORD': 'Hello123456#',
-        'HOST': 'localhost',
+        'HOST': '178.16.139.173',
         'PORT': '3306',
     }
 }
