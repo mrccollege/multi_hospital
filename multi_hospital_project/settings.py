@@ -77,16 +77,16 @@ DATABASES = {
 }
 
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'multi_hospi',
-#         'USER': 'multi_hospi',
-#         'PASSWORD': 'qwerty123',
-#         'HOST': 'localhost',
-#         'PORT': '3306',
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'multi_hospi',
+        'USER': 'mrc'@'localhost',
+        'PASSWORD': 'Hello123456#',
+        'HOST': 'localhost',
+        'PORT': '3306',
+    }
+}
 
 
 # Password validation
