@@ -81,7 +81,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'multi_hospi',
-        'USER': 'multi_hospi@178.16.139.173',
+        'USER': 'multi_hospi'@'178.16.139.173',
         'PASSWORD': 'Hello123456#',
         'HOST': 'localhost',
         'PORT': '3306',
