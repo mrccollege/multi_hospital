@@ -83,7 +83,7 @@ DATABASES = {
         'NAME': 'multi_hospi',
         'USER': 'mrc_hospi',
         'PASSWORD': 'Hello123456#',
-        'HOST': '178.16.139.173',
+        'HOST': 'liveserver.site',
         'PORT': '3306',
     }
 }
