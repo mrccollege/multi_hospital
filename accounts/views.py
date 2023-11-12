@@ -65,6 +65,10 @@ def user_logout(request):
 
 def doctor_registration(request):
     if request.method == 'POST':
+        hospital_user_id = request.session.get('hospital_user_id')
+        if hospital_user_id is None:
+            redirect('/accounts/hospital-login/')
+
         form = request.POST
         full_name = form.get('doctorName')
         full_name = full_name.title()
@@ -88,14 +92,12 @@ def doctor_registration(request):
                                               user_type=user_type,
                                               )
         if user:
-            hospital_user_id = request.session.get('hospital_user_id')
             h_id = HospitalUser.objects.get(user_id=hospital_user_id)
             doctor = DoctorUser.objects.create(user_id=user.id, hospital_id=h_id.h_id)
             if doctor:
                 return redirect('/')
 
     else:
-        hospital_user_id = request.session.get('hospital_user_id')
         return render(request, 'doctor_registration.html')
 
 

@@ -8,7 +8,8 @@ class HeaderPatient(models.Model):
     head_id = models.AutoField(primary_key=True)
     appointment = models.ForeignKey(PatientAppointment, on_delete=models.CASCADE)
     disease = models.TextField(null=True, blank=True)
-    status = models.CharField(max_length=10, default='unbilled')
+    doctor_status = models.CharField(max_length=10, default='unchecked')
+    bill_status = models.CharField(max_length=10, default='unbilled')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
