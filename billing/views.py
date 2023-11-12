@@ -19,7 +19,7 @@ def patient_billing_list(request):
     mini_medical_user_id = request.session['mini_medical_user_id']
     mini_medical_details = MiniStore.objects.get(mini_store_user_id=mini_medical_user_id)
     hospital_id = mini_medical_details.hospital_id
-    patient_bill = HeaderPatient.objects.filter(appointment__hospital_id=hospital_id, status='unbilled')
+    patient_bill = HeaderPatient.objects.filter(appointment__hospital_id=hospital_id, bill_status='unbilled')
     context = {
         'patient_bill': patient_bill,
     }
