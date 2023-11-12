@@ -110,12 +110,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-PASSWORD_HASHERS = [
-    'django.contrib.auth.hashers.Argon2PasswordHasher',
-    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
-]
-
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
