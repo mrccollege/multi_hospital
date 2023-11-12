@@ -79,6 +79,7 @@ WSGI_APPLICATION = 'multi_hospital_project.wsgi.application'
 
 
 DATABASES = {
+
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'multi_hospi',
