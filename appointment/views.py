@@ -4,6 +4,20 @@ from accounts.models import DoctorUser, PatientUser, HospitalUser
 from .models import PatientAppointment
 
 
+def patient_appointment_list(request):
+    hospital_user_id = request.session.get('hospital_user_id')
+    if hospital_user_id is None:
+        return redirect('/accounts/hospital-login/')
+    else:
+        h_id = HospitalUser.objects.get(user_id=hospital_user_id)
+        appoint = PatientAppointment.objects.filter(hospital_id=h_id.h_id)
+        print(appoint, '=============================appoint')
+        context = {
+            'appoint': appoint,
+        }
+    return render(request, 'appointment_list.html', context)
+
+
 # Create your views here.
 def patient_appointment(request):
     if request.method == 'POST':
@@ -25,7 +39,7 @@ def patient_appointment(request):
                                                     weight=weight, )
 
         if appoint:
-            return redirect('/')
+            return redirect('/appointment/patient_appointment_list/')
     doctor = DoctorUser.objects.filter()
     context = {
         'doctor': doctor
