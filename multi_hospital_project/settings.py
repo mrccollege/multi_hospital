@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'dashboard',
     'patient_report',
     'billing',
+    'site_settings',
 ]
 
 MIDDLEWARE = [
