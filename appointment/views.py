@@ -46,7 +46,7 @@ def patient_appointment(request):
             return redirect('/appointment/patient_appointment_list/')
 
     else:
-        doctor = DoctorUser.objects.filter()
+        doctor = DoctorUser.objects.filter(hospital_id=h_id.h_id)
         ward = HospitalAppointmentVisit.objects.filter(hospital_id=h_id.h_id)
         context = {
             'doctor': doctor,
