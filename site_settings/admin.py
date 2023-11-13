@@ -7,4 +7,4 @@ class LookupFieldAdmin(admin.ModelAdmin):
     list_display = ['id', 'code', 'title', 'hospital']
 
 
-admin.site.register(LookupField)
+admin.site.register(LookupField, LookupFieldAdmin)
