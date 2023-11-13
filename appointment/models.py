@@ -1,12 +1,13 @@
 from django.db import models
 
-
 # Create your models here.
 from accounts.models import HospitalUser, DoctorUser, PatientUser
+from dashboard.models import HospitalAppointmentVisit
 
 
 class PatientAppointment(models.Model):
     patient_appoint_id = models.AutoField(primary_key=True)
+    appoint_ward = models.ForeignKey(HospitalAppointmentVisit, on_delete=models.CASCADE)
     hospital = models.ForeignKey(HospitalUser, on_delete=models.CASCADE)
     doctor = models.ForeignKey(DoctorUser, on_delete=models.CASCADE)
     patient = models.ForeignKey(PatientUser, on_delete=models.CASCADE)
