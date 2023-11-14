@@ -14,7 +14,7 @@ SECRET_KEY = 'django-insecure-_4=$=(q&*=n@tdfc@j$zx-5gizfzil$h9q!zy4m*69-7)z@bf-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*', 'www.mrccollege.in', 'mrccollege.in', 'liveserver.site', 'www.liveserver.site']
+ALLOWED_HOSTS = []
 
 
 # Application definition
