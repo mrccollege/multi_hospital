@@ -44,7 +44,7 @@
     <div class="row">
         <div class="col-md-12">
             <div class="panel panel-default">
-                <form action="" method="post">
+                <form action="" method="post">{% csrf_token %}
                     <div class="panel-heading">
                         <div class="row">
                             <input type="hidden" name="head_id" value="{{head_id}}">
