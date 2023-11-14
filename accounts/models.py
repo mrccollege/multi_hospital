@@ -5,7 +5,7 @@ from django.utils import timezone
 
 class CustomUser(AbstractUser):
     full_name = models.CharField(max_length=500)
-    username = models.CharField(max_length=50, null=True, blank=True, unique=True)
+    username = models.CharField(max_length=256, null=True, blank=True, unique=True)
     email = models.EmailField(unique=True, null=True, blank=True, default=None)
     password = models.CharField(max_length=256)
     address = models.TextField(null=True, blank=True)
@@ -13,8 +13,8 @@ class CustomUser(AbstractUser):
     gender = models.CharField(max_length=10, null=True, blank=True, default=None)
     mobile = models.CharField(max_length=15, null=True, blank=True)
     phone = models.CharField(max_length=25, null=True, blank=True)
-    user_type = models.CharField(max_length=10)
-    specialization = models.CharField(max_length=100, null=True, blank=True, default=None)
+    user_type = models.CharField(max_length=50)
+    specialization = models.CharField(max_length=256, null=True, blank=True, default=None)
     degree = models.CharField(max_length=500, null=True, blank=True, default=None)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
