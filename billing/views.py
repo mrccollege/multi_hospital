@@ -7,7 +7,8 @@ from django.shortcuts import render, redirect
 from accounts.models import CustomUser
 from billing.models import PatientBillHistory
 from patient_report.models import HeaderPatient, DetailsPatient
-from store.models import MiniStore
+from store.models import MiniStore, MappingMiniStorMedicine
+
 
 def mini_store_logout(request):
     logout(request)
@@ -40,6 +41,10 @@ def generate_bill(request, head_id):
 
 def generated_bill(request, id=0):
     if request.method == 'POST':
+        mini_medical_user_id = request.session.get('mini_medical_user_id')
+        if mini_medical_user_id is None:
+            return redirect('/accounts/mini_medical_store_login/')
+
         form = request.POST
         medicine_ids = form.getlist('medicine_id')
         head_id = form.get('head_id')
@@ -66,6 +71,12 @@ def generated_bill(request, id=0):
                                                         remaining=remaining_amount,
                                                         )
             if history:
+                for i in range(len(medicine_ids)):
+                    if medicine_ids[i]:
+                        medi_qty = MappingMiniStorMedicine.objects.get(medicine_id=medicine_ids[i])
+                        medi_qty = medi_qty.mini_qty
+                        medi_qty = int(medi_qty) - int(medicine_ids[i])
+                        MappingMiniStorMedicine.objects.filter(mini_store_user_id=mini_medical_user_id, medicine_id=medicine_ids[i]).update(mini_qty=medi_qty)
                 header = HeaderPatient.objects.filter(head_id=head_id).update(status='billed')
                 if header:
                     msg = 'Bill Successfully Generated'

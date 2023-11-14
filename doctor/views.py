@@ -18,7 +18,7 @@ def doctor_dashboard(request):
 
     if doctor_user_id:
         doctor_details = DoctorUser.objects.get(user_id=doctor_user_id)
-        appoint = PatientAppointment.objects.filter(doctor__user_id=doctor_user_id)
+        appoint = PatientAppointment.objects.filter(doctor__user_id=doctor_user_id, appoint_status='unchecked', hospital_id=doctor_details.hospital.h_id)
         context = {
             'hospital_id': doctor_details.hospital.h_id,
             'doctor_details': doctor_details,
@@ -70,6 +70,7 @@ def patient_report(request, appointment_id):
                                             disease=[disease],
                                             )
         if head:
+            PatientAppointment.objects.filter(patient_appoint_id=appointment_id).update(appoint_status='checked')
             for i in range(len(medicine_id)):
                 if medicine_id[i]:
                     DetailsPatient.objects.create(header_id=head.head_id,
