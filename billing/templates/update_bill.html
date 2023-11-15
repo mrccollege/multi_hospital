@@ -22,11 +22,11 @@
             <hr>
             <div class="row">
                 <div class="col-xs-6">
-                    <p><strong>Patient Name:</strong> {{header.appointment.patient.user.full_name|title}}</p>
-                    <p><strong>Age:</strong> {{header.appointment.patient.user.age}}</p>
-                    <p><strong>Gender:</strong> {{header.appointment.patient.user.gender|title}}</p>
-                    <p><strong>Contact:</strong> {{header.appointment.patient.user.mobile}}</p>
-                    <p><strong>Address:</strong> {{header.appointment.patient.user.address}}</p>
+                    <p><strong>Patient Name:</strong> {{header.header_patient.appointment.patient.user.full_name|title}}</p>
+                    <p><strong>Age:</strong> {{header.header_patient.appointment.patient.user.age}}</p>
+                    <p><strong>Gender:</strong> {{header.header_patient.appointment.patient.user.gender|title}}</p>
+                    <p><strong>Contact:</strong> {{header.header_patient.appointment.patient.user.mobile}}</p>
+                    <p><strong>Address:</strong> {{header.header_patient.appointment.patient.user.address}}</p>
                 </div>
                 <div class="col-xs-6 text-right">
                     <address>
@@ -47,29 +47,28 @@
                 <form id="patient_report_form" action="" method="post">{% csrf_token %}
                     <div class="panel-heading">
                         <div class="row">
-                            <input type="hidden" name="bill_id" id="bill_id" value="0">
-                            <input type="hidden" name="head_id" value="{{head_id}}">
-                            <input type="hidden" name="patient_id" value="{{header.appointment.patient_id}}">
-                            <input type="hidden" name="hospital_id" value="{{header.appointment.hospital_id}}">
-                            <input type="hidden" name="doctor_id" value="{{header.appointment.doctor_id}}">
+                            <input type="hidden" name="bill_id" id="bill_id" value="{{bill_id}}">
+                            <input type="hidden" name="head_id" value="{{header.header_patient.head_id}}">
+                            <input type="hidden" name="patient_id" value="{{header.header_patient.appointment.patient_id}}">
+                            <input type="hidden" name="hospital_id" value="{{header.header_patient.appointment.hospital_id}}">
+                            <input type="hidden" name="doctor_id" value="{{header.header_patient.appointment.doctor_id}}">
                             <div class="col-lg-8">
                                 <div class="col-lg-4">
                                     <label>Cash</label>
                                     <input type="number" class="form-control" name="cash_amount" id="cash_amount"
-                                           placeholder="Enter Cash Amount" value="0">
+                                           placeholder="Enter Cash Amount" value="{{header.cash}}">
                                 </div>
 
                                 <div class="col-lg-4">
                                     <label>Online</label>
                                     <input type="number" class="form-control" name="online_amount" id="online_amount"
-                                           placeholder="Enter Online Amount" value="0">
+                                           placeholder="Enter Online Amount" value="{{header.online}}">
                                 </div>
 
                                 <div class="col-lg-4">
                                     <label>Remaining</label>
-                                    <input type="number" class="form-control" name="remaining_amount"
-                                           id="remaining_amount"
-                                           value="0">
+                                    <input type="number" class="form-control" name="remaining_amount" id="remaining_amount"
+                                           value="{{header.remaining}}">
                                 </div>
                             </div>
 
@@ -127,11 +126,11 @@
                 var html = '';
                 html += '<tr id="medicine_tr'+index+'">';
                 html += '<td>{{forloop.counter}}</td>';
-                html += '<td><input value="{{details.medicine_details.name}} {{details.medicine_details.batch_no}}" onkeyup="search_medicine('+index+');" type="text" id="medicine'+index+'" name="medicine" class="form-control" autocomplete="off"></td>';
-                html += '<input value="{{details.medicine_details.medicine_id}}" type="hidden" name="medicine_id" class="form-control" id="medicine_id'+index+'">';
-                html += '<td><input readonly value="{{details.medicine_details.price}}" type="text" id="price'+index+'" class="form-control" name="price"></td>';
-                html += '<td><input onkeyup="add_qty('+index+');" type="text" id="qty'+index+'" name="qty" class="form-control" placeholder="Enter quantity"></td>';
-                html += '<td><input value="0" type="text" id="total'+index+'" name="total" class="total form-control" readonly></td>';
+                html += '<td><input value="{{details.medicine.name}} {{details.medicine_details.batch_no}}" onkeyup="search_medicine('+index+');" type="text" id="medicine'+index+'" name="medicine" class="form-control" autocomplete="off"></td>';
+                html += '<input value="{{details.medicine.medicine_id}}" type="hidden" name="medicine_id" class="form-control" id="medicine_id'+index+'">';
+                html += '<td><input readonly value="{{details.medicine.price}}" type="text" id="price'+index+'" class="form-control" name="price"></td>';
+                html += '<td><input value="{{details.qty}}" onkeyup="add_qty('+index+');" type="text" id="qty'+index+'" name="qty" class="form-control"></td>';
+                html += '<td><input value="{{details.total}}" type="text" id="total'+index+'" name="total" class="total form-control" readonly></td>';
                 html += '<td><input type="hidden" readonly></td>';
                 html += '</tr>';
 
