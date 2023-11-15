@@ -116,9 +116,7 @@ def generated_bill(request, id=0):
             if history:
                 medi_details = PatientBillHistoryDetails.objects.filter(head_id=id)
                 for j in medi_details:
-                    medicine_qty = MappingMiniStorMedicine.objects.get(medicine_id=j.medicine.medicine_id,
-                                                                       mini_store_user_id=mini_medical_user_id,
-                                                                       )
+                    medicine_qty = MappingMiniStorMedicine.objects.get(medicine_id=j.medicine.medicine_id, mini_store_user_id=mini_medical_user_id)
                     medi_qty = medicine_qty.mini_qty
                     medicine_qty.mini_qty = int(medi_qty) + int(j.qty)
                     medicine_qty.save()
@@ -139,7 +137,6 @@ def generated_bill(request, id=0):
                         medi_qty = medicine_qty.mini_qty
                         medicine_qty.mini_qty = int(medi_qty) - int(qty[i])
                         medicine_qty.save()
-
                 header = HeaderPatient.objects.filter(head_id=head_id).update(bill_status='billed')
                 if header:
                     msg = 'Bill Updated Successfully'
@@ -201,10 +198,6 @@ def generate_pdf(request, bill_id):
         price = invoice.price
         medicine_list = []
 
-        print(medicine, '=================medi')
-        print(qty, '=================qty')
-        print(price, '=================price')
-
         for i in range(len(list(medicine))):
             medi = MappingMiniStorMedicine.objects.get(medicine_id=medicine[i])
             medi_dict = {}
@@ -213,7 +206,6 @@ def generate_pdf(request, bill_id):
             medi_dict['medicine_price'] = price[i]
 
             medicine_list.append(medi_dict)
-        print(medicine_list, '===============medicine_list')
 
         context = {
             'bill_id': bill_id,
@@ -232,7 +224,6 @@ def generate_pdf(request, bill_id):
 def send_email(request, bill_id):
     invoice_detail = PatientBillHistory.objects.get(id=bill_id)
     patient = invoice_detail.header_patient.appointment.patient.user.full_name
-    print(patient, '==================patient')
     recipient_list = invoice_detail.header_patient.appointment.patient.user.email
     message = f"HELLO, {patient}"
     subject = 'Your Bill Generated'

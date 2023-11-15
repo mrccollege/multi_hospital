@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
@@ -70,8 +71,7 @@ def doctor_registration(request):
     if request.method == 'POST':
         hospital_user_id = request.session.get('hospital_user_id')
         if hospital_user_id is None:
-            redirect('/accounts/hospital-login/')
-
+            return redirect('/accounts/hospital-login/')
         form = request.POST
         full_name = form.get('doctorName')
         full_name = full_name.title()
@@ -98,10 +98,14 @@ def doctor_registration(request):
             h_id = HospitalUser.objects.get(user_id=hospital_user_id)
             doctor = DoctorUser.objects.create(user_id=user.id, hospital_id=h_id.h_id)
             if doctor:
-                return redirect('/')
-
+                return redirect('/dashboard/hospital/')
     else:
-        return render(request, 'doctor_registration.html')
+        hospital_user_id = request.session.get('hospital_user_id')
+        if hospital_user_id is None:
+            return redirect('/accounts/hospital-login/')
+        else:
+            return render(request, 'doctor_registration.html')
+
 
 
 def add_reference(request):
@@ -156,7 +160,10 @@ def get_patient_reference(request):
 
 def patient_registration(request):
     hospital_user_id = request.session.get('hospital_user_id')
+    if hospital_user_id is None:
+            return redirect('/accounts/hospital-login/')
     h_id = HospitalUser.objects.get(user_id=hospital_user_id)
+
     if request.method == 'POST':
         form = request.POST
         full_name = form.get('patientName')
@@ -187,9 +194,7 @@ def patient_registration(request):
             patient_ref = patient_ref
         else:
             patient_ref = None
-        print(other_ref, '==============================================other_ref')
-        print(social_ref, '==============================================social_ref')
-        print(patient_ref, '==============================================patient')
+
         user = CustomUser.objects.create_user(full_name=full_name,
                                               username=email,
                                               age=age,
@@ -208,7 +213,7 @@ def patient_registration(request):
                                                  patient_ref=patient_ref,
                                                  )
             if patient:
-                return redirect('/')
+                return redirect('/dashboard/hospital/')
     else:
         social_ref = SocialMediaReference.objects.filter(hospital_id=h_id.h_id)
         other_ref = OtherReference.objects.filter(hospital_id=h_id.h_id)

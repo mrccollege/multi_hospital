@@ -43,6 +43,9 @@ class PatientBillHistoryHead(models.Model):
     class Meta:
         db_table = 'patient_bill_history_head'
 
+    def __str__(self):
+        return str(self.patient.user.full_name)
+
 
 class PatientBillHistoryDetails(models.Model):
     detail_id = models.AutoField(primary_key=True)
@@ -57,3 +60,6 @@ class PatientBillHistoryDetails(models.Model):
 
     class Meta:
         db_table = 'patient_bill_history_details'
+
+    def __str__(self):
+        return str(self.medicine.name)

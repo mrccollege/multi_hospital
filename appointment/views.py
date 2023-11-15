@@ -22,7 +22,7 @@ def patient_appointment_list(request):
 def patient_appointment(request):
     hospital_user_id = request.session.get('hospital_user_id')
     if hospital_user_id is None:
-        redirect('/accounts/hospital-login/')
+        return redirect('/accounts/hospital-login/')
     h_id = HospitalUser.objects.get(user_id=hospital_user_id)
     if request.method == 'POST':
         form = request.POST

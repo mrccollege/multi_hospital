@@ -202,7 +202,9 @@ $(document).ready(function() {
             type: 'POST',
             data: formData,
             success: function(response) {
-                console.log(response);
+                if(response.appointment_id != 0){
+                    window.location.href = '/doctor/dashboard/'
+                }
             },
             error: function(error) {
                 // Handle any error
