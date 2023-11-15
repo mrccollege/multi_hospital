@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <style>
+        body {
+            background: url('{{back_img}}') center/cover no-repeat fixed; /* Replace with your image URL */
+            backdrop-filter: blur(10px); /* Adjust the blur strength as needed */
+            margin: 0; /* Remove default body margin */
+        }
+
+        .radio-label {
+            position: relative;
+            display: inline-block;
+            padding-left: 30px;
+            line-height: 24px;
+            cursor: pointer;
+            color: white; /* Text color for labels */
+            font-weight: bold; /* Make text bold */
+        }
+
+        .radio-label::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+            width: 24px;
+            height: 24px;
+            background-color: rgba(255, 255, 255, 0.5); /* Transparent white background */
+            border: 2px solid #fff; /* Border color for radio button */
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .radio-label input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .radio-label input:checked + label::before {
+            background-color: #fff; /* Change the background color when the radio button is checked */
+        }
+
+        .radio-row{
+            background-color:black;
+            padding:15px
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Navbar</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Link</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        Dropdown
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" href="#">Action</a></li>
+                        <li><a class="dropdown-item" href="#">Another action</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="#">Something else here</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+                </li>
+            </ul>
+            <form class="d-flex">
+                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-success" type="submit">Search</button>
+            </form>
+        </div>
+    </div>
+</nav>
+<div class="container d-flex align-items-center justify-content-center vh-100">
+    <div class="col-lg-8 text-center">
+        <div class="row radio-row border">
+            <div class="col-lg-3">
+                <input type="radio" name="login" id="hospital_login">
+                <label class="radio-label" for="hospital_login">Hospital</label>
+            </div>
+            <div class="col-lg-3">
+                <input type="radio" name="login" id="main_medical_login">
+                <label class="radio-label" for="main_medical_login">Main Medical</label>
+            </div>
+            <div class="col-lg-3">
+                <input type="radio" name="login" id="mini_medical_login">
+                <label class="radio-label" for="mini_medical_login">Mini Medical</label>
+            </div>
+
+            <div class="col-lg-3">
+                <input type="radio" name="login" id="doctor_login">
+                <label class="radio-label" for="doctor_login">Doctor Login</label>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+<script>
+    $('#hospital_login').click(function(){
+        window.open('/accounts/hospital-login/', '_blank');
+    })
+
+    $('#main_medical_login').click(function(){
+        window.open('/store/main_medical_store_dashboard/', '_blank');
+    })
+
+    $('#mini_medical_login').click(function(){
+        window.open('/store/mini_medical_store_dashboard/', '_blank');
+    })
+
+    $('#doctor_login').click(function(){
+        window.open('/doctor/dashboard/', '_blank');
+    })
+</script>
+
+<script>
+
+</script>
+
+</body>
+</html>

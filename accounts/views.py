@@ -4,6 +4,7 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect
 
 # Create your views here.
+from site_settings.models import LookupField
 from store.models import MainStore, MiniStore
 from .models import CustomUser, HospitalUser, DoctorUser, PatientUser, SocialMediaReference, OtherReference
 
@@ -52,10 +53,12 @@ def hospital_login(request):
                 user = authenticate(username=username, password=password)
                 login(request, user)
                 request.session['hospital_user_id'] = user.id
-                return redirect('/')
+                return redirect('/dashboard/hospital/')
         else:
             error_message = "Invalid username or password"
-    return render(request, 'hospital_login.html')
+
+    else:
+        return render(request, 'hospital_login.html')
 
 
 def user_logout(request):
