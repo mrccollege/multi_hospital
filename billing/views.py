@@ -66,7 +66,7 @@ def generated_bill(request, id=0):
         cash_amount = form.get('cash_amount')
         online_amount = form.get('online_amount')
         remaining_amount = form.get('remaining_amount')
-
+        print(medicine_ids, '===============medicine_ids')
         g_amount = int(cash_amount) + int(online_amount) + int(remaining_amount)
 
         msg = ''

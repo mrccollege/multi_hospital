@@ -243,7 +243,7 @@ def main_medical_store_registration(request):
             h_id = HospitalUser.objects.get(user_id=hospital_user_id)
             obj = MainStore.objects.create(main_store_user_id=user.id, hospital_id=h_id.h_id)
             if obj:
-                return redirect('/')
+                return redirect('/dashboard/hospital/')
 
     return render(request, 'main_medical_store_register.html')
 
@@ -292,7 +292,7 @@ def mini_medical_store_registration(request):
             h_id = HospitalUser.objects.get(user_id=hospital_user_id)
             obj = MiniStore.objects.create(mini_store_user_id=user.id, hospital_id=h_id.h_id)
             if obj:
-                return redirect('/')
+                return redirect('/dashboard/hospital/')
 
     return render(request, 'mini_medical_store_register.html')
 
