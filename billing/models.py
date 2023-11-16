@@ -29,8 +29,8 @@ class PatientBillHistory(models.Model):
 class PatientBillHistoryHead(models.Model):
     head_id = models.AutoField(primary_key=True)
     header_patient = models.ForeignKey(HeaderPatient, on_delete=models.CASCADE)
-    patient = models.ForeignKey(PatientUser, on_delete=models.CASCADE)
-    doctor = models.ForeignKey(DoctorUser, on_delete=models.CASCADE)
+    patient = models.ForeignKey(PatientUser, on_delete=models.CASCADE, null=True, blank=True)
+    doctor = models.ForeignKey(DoctorUser, on_delete=models.CASCADE, null=True, blank=True)
     hospital = models.ForeignKey(HospitalUser, on_delete=models.CASCADE)
     cash = models.IntegerField(null=True, default=0)
     online = models.IntegerField(null=True, default=0)

@@ -116,7 +116,8 @@ def generated_bill(request, id=0):
             if history:
                 medi_details = PatientBillHistoryDetails.objects.filter(head_id=id)
                 for j in medi_details:
-                    medicine_qty = MappingMiniStorMedicine.objects.get(medicine_id=j.medicine.medicine_id, mini_store_user_id=mini_medical_user_id)
+                    medicine_qty = MappingMiniStorMedicine.objects.get(medicine_id=j.medicine.medicine_id,
+                                                                       mini_store_user_id=mini_medical_user_id)
                     medi_qty = medicine_qty.mini_qty
                     medicine_qty.mini_qty = int(medi_qty) + int(j.qty)
                     medicine_qty.save()
@@ -161,6 +162,120 @@ def generated_bill(request, id=0):
             'details': details,
         }
         return render(request, 'update_bill.html', context)
+
+
+def new_customer_bill(request):
+    mini_medical_user_id = request.session.get('mini_medical_user_id')
+    if mini_medical_user_id is None:
+        return redirect('/accounts/mini_medical_store_login/')
+    else:
+        return render(request, 'new_customer_bill.html')
+
+
+def new_customer_generate_bill(request, bill_id):
+    if request.method == 'POST':
+        mini_medical_user_id = request.session.get('mini_medical_user_id')
+        if mini_medical_user_id is None:
+            return redirect('/accounts/mini_medical_store_login/')
+        mini_medical_user_id = MiniStore.objects.get(mini_store_user_id=mini_medical_user_id)
+        hospital_id = mini_medical_user_id.hospital.h_id
+        mini_medical_user_id = mini_medical_user_id.mini_store_id
+
+        if mini_medical_user_id is None:
+            return redirect('/accounts/mini_medical_store_login/')
+
+        form = request.POST
+
+        medicine_ids = form.getlist('medicine_id')
+        qty = form.getlist('qty')
+        price = form.getlist('price')
+        total = form.getlist('total')
+        cash_amount = form.get('cash_amount')
+        online_amount = form.get('online_amount')
+        remaining_amount = form.get('remaining_amount')
+
+        g_amount = int(cash_amount) + int(online_amount) + int(remaining_amount)
+
+        msg = ''
+        status = 0
+        if bill_id == 0:
+            history = PatientBillHistoryHead.objects.create(header_patient_id=None,
+                                                            hospital_id=hospital_id,
+                                                            patient_id=None,
+                                                            doctor_id=None,
+                                                            grand_total=g_amount,
+                                                            cash=cash_amount,
+                                                            online=online_amount,
+                                                            remaining=remaining_amount,
+                                                            mini_store_id=mini_medical_user_id,
+                                                            )
+            if history:
+                for i in range(len(medicine_ids)):
+                    if medicine_ids[i]:
+                        PatientBillHistoryDetails.objects.create(head_id=history.head_id,
+                                                                 medicine_id=medicine_ids[i],
+                                                                 qty=qty[i],
+                                                                 price=price[i],
+                                                                 total=total[i],
+                                                                 )
+
+                        medicine_qty = MappingMiniStorMedicine.objects.get(medicine_id=medicine_ids[i],
+                                                                           mini_store_user_id=mini_medical_user_id)
+                        medi_qty = medicine_qty.mini_qty
+                        medicine_qty.mini_qty = int(medi_qty) - int(qty[i])
+                        medicine_qty.save()
+
+                msg = 'Bill Generated Successfully '
+                status = 1
+                bill_id = history.head_id
+
+            else:
+                msg = 'Bill Generated Failed!'
+
+        else:
+            history = PatientBillHistoryHead.objects.filter(head_id=bill_id).update(grand_total=g_amount,
+                                                                                    cash=cash_amount,
+                                                                                    online=online_amount,
+                                                                                    remaining=remaining_amount,
+                                                                                    )
+            if history:
+                medi_details = PatientBillHistoryDetails.objects.filter(head_id=bill_id)
+                for j in medi_details:
+                    medicine_qty = MappingMiniStorMedicine.objects.get(medicine_id=j.medicine.medicine_id,
+                                                                       mini_store_user_id=mini_medical_user_id)
+                    medi_qty = medicine_qty.mini_qty
+                    medicine_qty.mini_qty = int(medi_qty) + int(j.qty)
+                    medicine_qty.save()
+
+                PatientBillHistoryDetails.objects.filter(head_id=bill_id).delete()
+
+                for i in range(len(medicine_ids)):
+                    if medicine_ids[i]:
+                        PatientBillHistoryDetails.objects.create(head_id=bill_id,
+                                                                 medicine_id=medicine_ids[i],
+                                                                 qty=qty[i],
+                                                                 price=price[i],
+                                                                 total=total[i],
+                                                                 )
+
+                        medicine_qty = MappingMiniStorMedicine.objects.get(medicine_id=medicine_ids[i],
+                                                                           mini_store_user_id=mini_medical_user_id)
+                        medi_qty = medicine_qty.mini_qty
+                        medicine_qty.mini_qty = int(medi_qty) - int(qty[i])
+                        medicine_qty.save()
+
+                msg = 'Bill Updated Successfully'
+                status = 1
+                bill_id = bill_id
+            else:
+                msg = 'Bill Updated Failed!'
+
+        context = {
+            'msg': msg,
+            'status': status,
+            'bill_id': bill_id,
+        }
+        return JsonResponse(context)
 
 
 def generated_billing_list(request):
