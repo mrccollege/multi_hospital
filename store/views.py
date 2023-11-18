@@ -46,8 +46,10 @@ def add_medicine(request, main_store_id):
 def search_medicine(request):
     if request.method == 'GET':
         form = request.GET
+        hospital_id = form.get('hospital_id')
         search_value = form.get('search_value')
-        medicine = Medicine.objects.filter(Q(name__icontains=search_value) |
+        hospi_query = Q(main_store__hospital__h_id=hospital_id)
+        medicine = Medicine.objects.filter(hospi_query, Q(name__icontains=search_value) |
                                            Q(batch_no__icontains=search_value))
         data_list = []
         for i in medicine:

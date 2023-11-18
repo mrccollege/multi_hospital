@@ -56,9 +56,13 @@ def patient_appointment(request):
 
 
 def patient_search(request):
+    hospital_user_id = request.session.get('hospital_user_id')
+    if hospital_user_id is None:
+        return redirect('/accounts/hospital-login/')
+    h_id = HospitalUser.objects.get(user_id=hospital_user_id)
     term = request.GET.get('term', '')
     # Search for patients and doctors whose names contain the search term
-    patient = PatientUser.objects.filter(user__full_name__icontains=term)
+    patient = PatientUser.objects.filter(user__full_name__icontains=term, hospital_id=h_id.h_id)
     patient_data = []
     for i in patient:
         data_dict = {}

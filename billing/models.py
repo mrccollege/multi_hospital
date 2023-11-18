@@ -3,7 +3,7 @@ from django.db import models
 # Create your models here.
 from accounts.models import PatientUser, DoctorUser, HospitalUser
 from patient_report.models import HeaderPatient
-from store.models import Medicine, MiniStore
+from store.models import Medicine, MiniStore, MainStore
 
 
 class PatientBillHistory(models.Model):
@@ -28,7 +28,7 @@ class PatientBillHistory(models.Model):
 
 class PatientBillHistoryHead(models.Model):
     head_id = models.AutoField(primary_key=True)
-    header_patient = models.ForeignKey(HeaderPatient, on_delete=models.CASCADE)
+    header_patient = models.ForeignKey(HeaderPatient, on_delete=models.CASCADE, null=True, blank=True)
     patient = models.ForeignKey(PatientUser, on_delete=models.CASCADE, null=True, blank=True)
     doctor = models.ForeignKey(DoctorUser, on_delete=models.CASCADE, null=True, blank=True)
     hospital = models.ForeignKey(HospitalUser, on_delete=models.CASCADE)
@@ -36,7 +36,8 @@ class PatientBillHistoryHead(models.Model):
     online = models.IntegerField(null=True, default=0)
     remaining = models.IntegerField(null=True, default=0)
     grand_total = models.IntegerField()
-    mini_store = models.ForeignKey(MiniStore, on_delete=models.CASCADE)
+    mini_store = models.ForeignKey(MiniStore, on_delete=models.CASCADE, null=True, blank=True)
+    main_store = models.ForeignKey(MainStore, on_delete=models.CASCADE, null=True, blank=True)
     created_at = models.DateField(auto_now_add=True)
     updated_at = models.DateField(null=True)
 
@@ -44,7 +45,7 @@ class PatientBillHistoryHead(models.Model):
         db_table = 'patient_bill_history_head'
 
     def __str__(self):
-        return str(self.patient.user.full_name)
+        return str(self.hospital)
 
 
 class PatientBillHistoryDetails(models.Model):

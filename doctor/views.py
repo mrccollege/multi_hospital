@@ -60,6 +60,10 @@ def doctor_logout(request):
 
 
 def patient_report(request, appointment_id):
+    doctor_user_id = request.session.get('doctor_user_id')
+    doc_obj = DoctorUser.objects.filter(user_id=doctor_user_id)
+    if doc_obj:
+        hospital_id = doc_obj[0].hospital.h_id
     if request.method == 'POST':
         form = request.POST
         disease = form.get('disease')
@@ -89,5 +93,6 @@ def patient_report(request, appointment_id):
         context = {
             'appointment_id': appointment_id,
             'appoint': appoint,
+            'hospital_id': hospital_id,
         }
         return render(request, 'patient_report.html', context)

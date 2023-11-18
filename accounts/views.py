@@ -29,6 +29,9 @@ def hospital_registration(request):
                                               )
         if user:
             obj = HospitalUser.objects.create(user_id=user.id)
+            social = ['Facebokk', 'Google', 'Youtube', 'Instagram']
+            for i in social:
+                SocialMediaReference.objects.create(type_reference=i, hospital_id=obj.h_id)
             if obj:
                 return redirect('/accounts/hospital-login/')
 

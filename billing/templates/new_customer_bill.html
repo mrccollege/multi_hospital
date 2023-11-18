@@ -164,7 +164,9 @@
                 $.ajax({
                     url: '/store/search-medicine/',
                     type: 'GET',
-                    data: { search_value: request.term },
+                    data: { search_value: request.term,
+                            hospital_id:'{{hospital_id}}',
+                    },
                     success: function (result) {
                         console.log(result.results, '----------result')
                         if (result.results) {

@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect
 # Create your views here.
 from billing.models import PatientBillHistory, PatientBillHistoryHead, PatientBillHistoryDetails
 from patient_report.models import HeaderPatient, DetailsPatient
-from store.models import MiniStore, MappingMiniStorMedicine
+from store.models import MiniStore, MappingMiniStorMedicine, MainStore, Medicine
 from django.core.mail import EmailMessage
 from django.http import HttpResponse
 from django.template.loader import get_template
@@ -16,14 +16,23 @@ from xhtml2pdf import pisa
 
 def mini_store_logout(request):
     logout(request)
-    return redirect('/accounts/mini_medical_store_login/')
+    return redirect('/')
 
 
-@login_required(login_url='/accounts/mini_medical_store_login/')
+@login_required(login_url='/')
 def patient_billing_list(request):
-    mini_medical_user_id = request.session['mini_medical_user_id']
-    mini_medical_details = MiniStore.objects.get(mini_store_user_id=mini_medical_user_id)
-    hospital_id = mini_medical_details.hospital_id
+    mini_medical_user_id = request.session.get('mini_medical_user_id')
+    main_medical_user_id = request.session.get('main_medical_user_id')
+    if mini_medical_user_id is not None:
+        mini_medical_user_id = mini_medical_user_id
+        mini_medical_details = MiniStore.objects.get(mini_store_user_id=mini_medical_user_id)
+        hospital_id = mini_medical_details.hospital_id
+
+    elif main_medical_user_id is not None:
+        main_medical_user_id = main_medical_user_id
+        main_medical_details = MainStore.objects.get(main_store_user_id=main_medical_user_id)
+        hospital_id = main_medical_details.hospital_id
+
     patient_bill = HeaderPatient.objects.filter(appointment__hospital_id=hospital_id, bill_status='unbilled')
     context = {
         'patient_bill': patient_bill,
@@ -32,12 +41,29 @@ def patient_billing_list(request):
 
 
 def generate_bill(request, head_id):
+    mini_medical_user_id = request.session.get('mini_medical_user_id')
+    main_medical_user_id = request.session.get('main_medical_user_id')
+
+    if mini_medical_user_id is not None:
+        mini_medical_user_id = mini_medical_user_id
+        mini_medical_obj = MiniStore.objects.filter(mini_store_user_id=mini_medical_user_id)
+        if mini_medical_obj:
+            hospital_id = mini_medical_obj[0].hospital.h_id
+    elif main_medical_user_id is not None:
+        main_medical_user_id = main_medical_user_id
+        main_medical_obj = MainStore.objects.filter(main_store_user_id=main_medical_user_id)
+        if main_medical_obj:
+            hospital_id = main_medical_obj[0].hospital.h_id
+    else:
+        return redirect('/')
+
     header = HeaderPatient.objects.get(head_id=head_id)
     details = DetailsPatient.objects.filter(header_id=head_id)
     context = {
         'head_id': head_id,
         'header': header,
         'details': details,
+        'hospital_id': hospital_id,
     }
     # return render(request, 'generate_bill.html', context)
     return render(request, 'generate_bill1.html', context)
@@ -46,16 +72,26 @@ def generate_bill(request, head_id):
 def generated_bill(request, id=0):
     if request.method == 'POST':
         mini_medical_user_id = request.session.get('mini_medical_user_id')
-        if mini_medical_user_id is None:
-            return redirect('/accounts/mini_medical_store_login/')
-        mini_medical_user_id = MiniStore.objects.get(mini_store_user_id=mini_medical_user_id)
-        mini_medical_user_id = mini_medical_user_id.mini_store_id
-        if mini_medical_user_id is None:
-            return redirect('/accounts/mini_medical_store_login/')
+        main_medical_user_id = request.session.get('main_medical_user_id')
+        if mini_medical_user_id is None and main_medical_user_id is None:
+            return redirect('/')
+
+        if mini_medical_user_id is not None:
+            mini_medical_user_id = MiniStore.objects.get(mini_store_user_id=mini_medical_user_id)
+            mini_medical_store_id = mini_medical_user_id.mini_store_id
+        else:
+            mini_medical_store_id = None
+
+        if main_medical_user_id is not None:
+            main_medical_user_id = MainStore.objects.get(main_store_user_id=main_medical_user_id)
+            main_medical_store_id = main_medical_user_id.main_store_id
+        else:
+            main_medical_store_id = None
 
         form = request.POST
 
         head_id = form.get('head_id')
+        print(head_id, '============head_id')
         patient_id = form.get('patient_id')
         hospital_id = form.get('hospital_id')
         doctor_id = form.get('doctor_id')
@@ -66,10 +102,10 @@ def generated_bill(request, id=0):
         cash_amount = form.get('cash_amount')
         online_amount = form.get('online_amount')
         remaining_amount = form.get('remaining_amount')
-        print(medicine_ids, '===============medicine_ids')
+        # print(medicine_ids, '===============medicine_ids')
         g_amount = int(cash_amount) + int(online_amount) + int(remaining_amount)
 
-        msg = ''
+        msg = 'something went wrong!'
         status = 0
         bill_id = 0
         if id == 0:
@@ -81,7 +117,8 @@ def generated_bill(request, id=0):
                                                             cash=cash_amount,
                                                             online=online_amount,
                                                             remaining=remaining_amount,
-                                                            mini_store_id=mini_medical_user_id,
+                                                            mini_store_id=mini_medical_store_id,
+                                                            main_store_id=main_medical_store_id,
                                                             )
             if history:
                 for i in range(len(medicine_ids)):
@@ -92,12 +129,18 @@ def generated_bill(request, id=0):
                                                                  price=price[i],
                                                                  total=total[i],
                                                                  )
-
-                        medicine_qty = MappingMiniStorMedicine.objects.get(medicine_id=medicine_ids[i],
-                                                                           mini_store_user_id=mini_medical_user_id)
-                        medi_qty = medicine_qty.mini_qty
-                        medicine_qty.mini_qty = int(medi_qty) - int(qty[i])
-                        medicine_qty.save()
+                        if mini_medical_user_id is not None:
+                            medicine_qty = MappingMiniStorMedicine.objects.get(medicine_id=medicine_ids[i],
+                                                                               mini_store_user_id=mini_medical_user_id)
+                            medi_qty = medicine_qty.mini_qty
+                            medicine_qty.mini_qty = int(medi_qty) - int(qty[i])
+                            medicine_qty.save()
+                        else:
+                            medicine_qty = Medicine.objects.get(medicine_id=medicine_ids[i],
+                                                                main_store_id=main_medical_store_id)
+                            medi_qty = medicine_qty.qty
+                            medicine_qty.qty = int(medi_qty) - int(qty[i])
+                            medicine_qty.save()
 
                 header = HeaderPatient.objects.filter(head_id=head_id).update(bill_status='billed')
                 if header:
@@ -166,24 +209,49 @@ def generated_bill(request, id=0):
 
 def new_customer_bill(request):
     mini_medical_user_id = request.session.get('mini_medical_user_id')
-    if mini_medical_user_id is None:
-        return redirect('/accounts/mini_medical_store_login/')
-    else:
-        return render(request, 'new_customer_bill.html')
+    main_medical_user_id = request.session.get('main_medical_user_id')
+    if mini_medical_user_id is None and main_medical_user_id is None:
+        return redirect('/')
+
+    if mini_medical_user_id is not None:
+        mini_medical_user_id = MiniStore.objects.get(mini_store_user_id=mini_medical_user_id)
+        hospital_id = mini_medical_user_id.hospital.h_id
+
+    if main_medical_user_id is not None:
+        main_medical_user_id = MainStore.objects.get(main_store_user_id=main_medical_user_id)
+        hospital_id = main_medical_user_id.hospital.h_id
+
+    context = {
+        'hospital_id': hospital_id
+    }
+    return render(request, 'new_customer_bill.html', context)
 
 
 def new_customer_generate_bill(request, bill_id):
     if request.method == 'POST':
         mini_medical_user_id = request.session.get('mini_medical_user_id')
-        if mini_medical_user_id is None:
-            return redirect('/accounts/mini_medical_store_login/')
-        mini_medical_user_id = MiniStore.objects.get(mini_store_user_id=mini_medical_user_id)
-        hospital_id = mini_medical_user_id.hospital.h_id
-        mini_medical_user_id = mini_medical_user_id.mini_store_id
+        main_medical_user_id = request.session.get('main_medical_user_id')
 
-        if mini_medical_user_id is None:
-            return redirect('/accounts/mini_medical_store_login/')
+        if mini_medical_user_id is None and main_medical_user_id is None:
+            return redirect('/')
 
+        if mini_medical_user_id is not None:
+            mini_medical_user_id = MiniStore.objects.get(mini_store_user_id=mini_medical_user_id)
+            hospital_id = mini_medical_user_id.hospital.h_id
+            mini_medical_store_id = mini_medical_user_id.mini_store_id
+        else:
+            mini_medical_store_id = None
+
+        if main_medical_user_id is not None:
+            main_medical_user_id = MainStore.objects.get(main_store_user_id=main_medical_user_id)
+            hospital_id = main_medical_user_id.hospital.h_id
+            main_medical_store_id = main_medical_user_id.main_store_id
+        else:
+            main_medical_store_id = None
+
+        header_patient_id = None
+        patient_id = None
+        doctor_id = None
         form = request.POST
 
         medicine_ids = form.getlist('medicine_id')
@@ -199,15 +267,16 @@ def new_customer_generate_bill(request, bill_id):
         msg = ''
         status = 0
         if bill_id == 0:
-            history = PatientBillHistoryHead.objects.create(header_patient_id=None,
+            history = PatientBillHistoryHead.objects.create(header_patient_id=header_patient_id,
                                                             hospital_id=hospital_id,
-                                                            patient_id=None,
-                                                            doctor_id=None,
+                                                            patient_id=patient_id,
+                                                            doctor_id=doctor_id,
                                                             grand_total=g_amount,
                                                             cash=cash_amount,
                                                             online=online_amount,
                                                             remaining=remaining_amount,
-                                                            mini_store_id=mini_medical_user_id,
+                                                            mini_store_id=mini_medical_store_id,
+                                                            main_store_id=main_medical_store_id,
                                                             )
             if history:
                 for i in range(len(medicine_ids)):
@@ -219,11 +288,18 @@ def new_customer_generate_bill(request, bill_id):
                                                                  total=total[i],
                                                                  )
 
-                        medicine_qty = MappingMiniStorMedicine.objects.get(medicine_id=medicine_ids[i],
-                                                                           mini_store_user_id=mini_medical_user_id)
-                        medi_qty = medicine_qty.mini_qty
-                        medicine_qty.mini_qty = int(medi_qty) - int(qty[i])
-                        medicine_qty.save()
+                        if mini_medical_user_id is not None:
+                            medicine_qty = MappingMiniStorMedicine.objects.get(medicine_id=medicine_ids[i],
+                                                                               mini_store_user_id=mini_medical_user_id)
+                            medi_qty = medicine_qty.mini_qty
+                            medicine_qty.mini_qty = int(medi_qty) - int(qty[i])
+                            medicine_qty.save()
+                        else:
+                            medicine_qty = Medicine.objects.get(medicine_id=medicine_ids[i],
+                                                                main_store_id=main_medical_store_id)
+                            medi_qty = medicine_qty.qty
+                            medicine_qty.qty = int(medi_qty) - int(qty[i])
+                            medicine_qty.save()
 
                 msg = 'Bill Generated Successfully '
                 status = 1
@@ -280,14 +356,20 @@ def new_customer_generate_bill(request, bill_id):
 
 def generated_billing_list(request):
     mini_medical_user_id = request.session.get('mini_medical_user_id')
-    if mini_medical_user_id is None:
-        return redirect('/accounts/mini_medical_store_login/')
-    mini_medical_user_id = MiniStore.objects.get(mini_store_user_id=mini_medical_user_id)
-    mini_medical_user_id = mini_medical_user_id.mini_store_id
-    if mini_medical_user_id is None:
-        return redirect('/accounts/mini_medical_store_login/')
+    main_medical_user_id = request.session.get('main_medical_user_id')
 
-    generated_bill = PatientBillHistoryHead.objects.filter(mini_store_id=mini_medical_user_id).order_by('-head_id')
+    if mini_medical_user_id is None and main_medical_user_id is None:
+        return redirect('/')
+
+    if mini_medical_user_id is not None:
+        mini_medical_user_id = MiniStore.objects.get(mini_store_user_id=mini_medical_user_id)
+        mini_medical_store_id = mini_medical_user_id.mini_store_id
+        generated_bill = PatientBillHistoryHead.objects.filter(mini_store_id=mini_medical_store_id).order_by('-head_id')
+
+    if main_medical_user_id is not None:
+        main_medical_user_id = MainStore.objects.get(main_store_user_id=main_medical_user_id)
+        main_medical_store_id = main_medical_user_id.main_store_id
+        generated_bill = PatientBillHistoryHead.objects.filter(main_store_id=main_medical_store_id).order_by('-head_id')
 
     context = {
         'bill': generated_bill,
