@@ -24,6 +24,7 @@
                         <input type="text" name="medicine_qty" id="medicine_qty" class="form-control"
                                placeholder="Enter medicine qty">
                         <input type="hidden" value="" id="hidden_medicine_id">
+                        <input type="hidden" value="" id="hidden_medicine_qty">
                     </div>
                 </div>
 
@@ -77,7 +78,7 @@
             <td>{{ medicine.main_store.hospital.user.full_name }}</td>
             <td>
                 <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                        onclick="transfer_medicine('{{medicine.medicine_id}}')" data-bs-target="#userInfoModal">Transfer
+                        onclick="transfer_medicine('{{medicine.medicine_id}}', '{{medicine.qty}}')" data-bs-target="#userInfoModal">Transfer
                 </button>
             </td>
 
@@ -90,7 +91,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     $(document).ready(function () {
         $('#myTable').DataTable();
@@ -99,7 +100,8 @@
 </script>
 
 <script>
-    function transfer_medicine(medicine_id) {
+    function transfer_medicine(medicine_id, hidden_medicine_qty) {
+
         $.ajax({
             url: '/store/get_mini_store_model_data/',
             type: 'GET',
@@ -113,6 +115,7 @@
                 });
                 select.show();
                 $('#hidden_medicine_id').val(medicine_id)
+                $('#hidden_medicine_qty').val(hidden_medicine_qty)
             }
         });
     }
@@ -120,7 +123,45 @@
     $('#transfer_medicine').click(function(){
         var medicine_id = $('#hidden_medicine_id').val()
         var mini_store_id = $('#selectOptions').val()
-        var medicine_qty = $('#medicine_qty').val()
+        var medicine_qty = parseInt($('#medicine_qty').val())
+        console.log(medicine_qty, '==========medicine_qty')
+        var hidden_medicine_qty = parseInt($('#hidden_medicine_qty').val())
+        if (hidden_medicine_qty < 1){
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "Stock Medicine Qty is 0 please add first!",
+            });
+            return false;
+        }
+        if (medicine_qty){
+            console.log(medicine_qty, '==========medicine_qty')
+        }else{
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "Please add Medicine minimum 1 qty!",
+            });
+            return false;
+        }
+
+        if (medicine_qty < 1){
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "Medicine Qty is less than 1!",
+            });
+            return false;
+        }
+
+        if (medicine_qty > hidden_medicine_qty){
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "Medicine Qty is more than stock qty!",
+            });
+            return false;
+        }
         $.ajax({
             url: '/store/transfer_medicine_to_mini_store/',
             type: 'GET',
