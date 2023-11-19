@@ -43,7 +43,6 @@
             <h2>{{mini_medical_store.mini_store_user.full_name}}</h2>
             <a href="/billing/patient_billing_list/" target="_blank" class="btn btn-primary">Bill Generate</a>
         </div>
-
     </div>
     <table id="myTable" class="table table-striped">
         <thead>
@@ -54,6 +53,7 @@
             <th>Price</th>
             <th>Expiration</th>
             <th>Hospital</th>
+            <th>Action</th>
         </tr>
         </thead>
         <tbody>
@@ -65,8 +65,10 @@
             <td>{{ medicine.medicine.price }}</td>
             <td>{{ medicine.medicine.expiration }}</td>
             <td>{{ mini_medical_store.hospital.user.full_name }}</td>
-
-
+            <td>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" onclick="transfer_medicine('{{medicine.medicine.medicine_id}}', '{{medicine.mini_qty}}')" data-bs-target="#userInfoModal">Transfer
+                </button>
+            </td>
         </tr>
         {% endfor %}
         </tbody>
@@ -84,5 +86,96 @@
 </script>
 
 
+<script>
+    function transfer_medicine(medicine_id, hidden_medicine_qty) {
+
+        $.ajax({
+            url: '/store/get_mini_store_model_data/',
+            type: 'GET',
+            data:{mini_medical_store_id:'{{mini_medical_store_id}}'},
+            success: function (data) {
+                console.log(data,'=============data')
+                var select = $('#selectOptions');
+                select.empty();
+                $.each(data.mini_store, function (index, item) {
+                    select.append('<option value="' + item.mini_store_id + '">' + item.mini_store_name + '</option>');
+                });
+                select.show();
+                $('#hidden_medicine_id').val(medicine_id)
+                $('#hidden_medicine_qty').val(hidden_medicine_qty)
+            }
+        });
+    }
+
+    $('#transfer_medicine').click(function(){
+        var medicine_id = $('#hidden_medicine_id').val()
+        var to_mini_store_id = $('#selectOptions').val()
+        var medicine_qty = parseInt($('#medicine_qty').val())
+        console.log(medicine_qty, '==========medicine_qty')
+        var hidden_medicine_qty = parseInt($('#hidden_medicine_qty').val())
+        if (hidden_medicine_qty < 1){
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "Stock Medicine Qty is 0 please add first!",
+            });
+            return false;
+        }
+        if (medicine_qty){
+            console.log(medicine_qty, '==========medicine_qty')
+        }else{
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "Please add Medicine minimum 1 qty!",
+            });
+            return false;
+        }
+
+        if (medicine_qty < 1){
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "Medicine Qty is less than 1!",
+            });
+            return false;
+        }
+
+        if (medicine_qty > hidden_medicine_qty){
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "Medicine Qty is more than stock qty!",
+            });
+            return false;
+        }
+        $.ajax({
+            url: '/store/transfer_medicine_mini_to_mini_store/',
+            type: 'GET',
+            data:{
+                'from_mini_medical_store_id': '{{mini_medical_store_id}}',
+                'medicine_id': medicine_id,
+                'to_mini_store_id': to_mini_store_id,
+                'medicine_qty' : medicine_qty,
+            },
+            success: function (data) {
+                console.log(data)
+                if (data.status == 1){
+                    location.reload()
+                }
+            }
+        });
+    });
+
+</script>
+
+<script>
+    function get_mini_store_records(){
+        var store_id = $('#mini_stores_list').val()
+        if (store_id){
+            window.location.href = '/store/view_mini_stores_record/'+store_id+'/'+{{hospital_id}}+'/'
+        }
+    }
+</script>
 </body>
 </html>
