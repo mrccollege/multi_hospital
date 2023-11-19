@@ -30,17 +30,32 @@ def patient_appointment(request):
         patient_id = form.get('patientID')
         doctor_id = form.get('doctorID')
         appointment_date = form.get('appointmentDate')
-        appointment_time = form.get('appointmentTime')
         blood_pressure = form.get('bloodPressure')
+        pulse = form.get('pulse')
         weight = form.get('weight')
+        paid_free = form.get('paid_free')
+        cash = form.get('cash')
+        online = form.get('online')
+        remaining = form.get('remaining')
+        ward_obj = HospitalAppointmentVisit.objects.filter(id=appoint_ward)
+        if ward_obj:
+            ward_price = ward_obj[0].price
+        else:
+            ward_price = None
         appoint = PatientAppointment.objects.create(hospital_id=h_id.h_id,
                                                     appoint_ward_id=appoint_ward,
                                                     patient_id=patient_id,
                                                     doctor_id=doctor_id,
                                                     appointment_date=appointment_date,
-                                                    appointment_time=appointment_time,
                                                     bloodPressure=blood_pressure,
-                                                    weight=weight, )
+                                                    weight=weight,
+                                                    fees=ward_price,
+                                                    pulses=pulse,
+                                                    paid_free=paid_free,
+                                                    cash=cash,
+                                                    online=online,
+                                                    remaining=remaining,
+                                                    )
 
         if appoint:
             return redirect('/appointment/patient_appointment_list/')
@@ -95,4 +110,17 @@ def doctor_search(request):
         'results': doctor_data,
     }
 
+    return JsonResponse(context)
+
+
+def get_ward_price(request):
+    form = request.GET
+    ward_id = form.get('ward_id')
+    ward_obj = HospitalAppointmentVisit.objects.filter(id=ward_id)
+    if ward_obj:
+        ward_price = ward_obj[0].price
+    context = {
+        'ward_id': ward_id,
+        'ward_price': ward_price,
+    }
     return JsonResponse(context)

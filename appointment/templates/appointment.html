@@ -31,6 +31,17 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
     </style>
 
     <style>
@@ -51,6 +62,17 @@
         .result:hover {
             background-color: #f5f5f5;
         }
+
+
+
+
+
+
+
+
+
+
+
     </style>
 </head>
 <body>
@@ -60,7 +82,8 @@
         <div class="row">
             <div class="col-lg-6 mb-3">
                 <label for="patientName" class="form-label">Patient Name</label>
-                <input type="text" class="form-control" id="patientName" placeholder="Enter or select a patient name" autocomplete="off">
+                <input type="text" class="form-control" id="patientName" placeholder="Enter or select a patient name"
+                       autocomplete="off">
                 <input type="hidden" name="patientID" id="patientID">
                 <div id="patient-search-results-dropdown"></div>
             </div>
@@ -86,30 +109,46 @@
         </div>
         <!-- Rest of the form remains unchanged -->
         <div class="row">
-            <div class="col-lg-6 mb-3">
+            <div class="col-lg-4 mb-3">
                 <label for="appointmentDate" class="form-label">Appointment Date</label>
                 <input type="date" class="form-control" name="appointmentDate" id="appointmentDate">
             </div>
-            <div class="col-lg-6 mb-3">
-                <label for="appointmentTime" class="form-label">Appointment Time</label>
-                <input type="time" id="timepicker" class="form-control" name="appointmentTime" id="appointmentTime">
+            <div class="col-lg-8 mb-3">
+                <div class="row">
+                    <div class="col-lg-4 mb-3">
+                        <label for="bloodPressure" class="form-label">Blood Pressure</label>
+                        <input type="text" value="120/80" class="form-control" name="bloodPressure" id="bloodPressure"
+                               placeholder="Enter BP (e.g., 120/80)">
+                    </div>
+                    <div class="col-lg-4 mb-3">
+                        <label for="pulse" class="form-label">Pulse</label>
+                        <input type="text" value="72" class="form-control" name="pulse" id="pulse"
+                               placeholder="Enter pulse">
+                    </div>
+                    <div class="col-lg-4 mb-3">
+                        <label for="weight" class="form-label">Weight (kg)</label>
+                        <input type="number" class="form-control" name="weight" id="weight"
+                               placeholder="Enter weight in kilograms">
+                    </div>
+                </div>
 
             </div>
         </div>
-        <div class="row">
-            <div class="col-lg-4 mb-3">
-                <label for="bloodPressure" class="form-label">Blood Pressure</label>
-                <input type="text" value="120/80" class="form-control" name="bloodPressure" id="bloodPressure"
-                       placeholder="Enter BP (e.g., 120/80)">
-            </div>
-            <div class="col-lg-4 mb-3">
-                <label for="pulse" class="form-label">Pulse</label>
-                <input type="text" value="72" class="form-control" name="pulse" id="pulse" placeholder="Enter pulse">
-            </div>
-            <div class="col-lg-4 mb-3">
-                <label for="weight" class="form-label">Weight (kg)</label>
-                <input type="number" class="form-control" name="weight" id="weight"
-                       placeholder="Enter weight in kilograms">
+
+
+        <div class="row mb-3">
+            <div class="col-lg-2 mx-auto">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <input checked type="radio" name="paid_free" value="Paid">
+                        <label>Paid</label>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <input type="radio" name="paid_free" value="Free">
+                        <label>Free</label>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -117,11 +156,12 @@
             <div class="col-lg-6">
                 <div class="row">
                     <div class="col-lg-6">
+                        <label for="hidden_ward_price">Visit Type</label>
                         <select name="appointment_ward" id="appointment_ward" class="form-control">
                             <option value="">Select ward</option>
-<!--                            <option money="250" value="OPD 09 AM TO 01 PM ">OPD 09 AM TO 01 PM</option>-->
-<!--                            <option money="350" value="OPD 01 AM TO 05 PM ">OPD 01 AM TO 05 PM</option>-->
-<!--                            <option money="500" value="EMERGENCY Above 05 PM">EMERGENCY Above 05 PM</option>-->
+                            <!--                            <option money="250" value="OPD 09 AM TO 01 PM ">OPD 09 AM TO 01 PM</option>-->
+                            <!--                            <option money="350" value="OPD 01 AM TO 05 PM ">OPD 01 AM TO 05 PM</option>-->
+                            <!--                            <option money="500" value="EMERGENCY Above 05 PM">EMERGENCY Above 05 PM</option>-->
                             {% for ward in ward %}
                             <option value="{{ward.id}}">{{ward.type}}</option>
                             {% endfor %}
@@ -129,20 +169,36 @@
                     </div>
 
                     <div class="col-lg-6">
-                        <input class="form-control" type="text" name="" id="" value="">
+                        <label for="hidden_ward_price">Fees</label>
+                        <input class="form-control" type="text" name="hidden_ward_price" id="hidden_ward_price"
+                               value="">
                     </div>
                 </div>
             </div>
+            <div class="col-lg-6">
+                <div class="row">
+                    <div class="col-lg-4">
+                        <label for="cash">Cash</label>
+                        <input class="form-control" type="text" name="cash" id="cash" value="0">
+                    </div>
 
-            <div class="col-lg-2">
-                <input checked type="radio" name="paid_free" id="" value="Paid">
-                <label>Paid</label>
+                    <div class="col-lg-4">
 
-                <input type="radio" name="paid_free" id="" value="Free">
-                <label>Free</label>
+                        <label for="online">Online</label>
+                        <input class="form-control" type="text" name="online" id="online" value="0">
+                    </div>
+
+                    <div class="col-lg-4">
+
+                        <label for="remaining">Remaining</label>
+                        <input class="form-control" type="text" name="remaining" id="remaining" value="0">
+                    </div>
+                </div>
             </div>
+        </div>
 
-            <div class="col-lg-8">
+        <div class="row mx-auto">
+            <div class="col-lg-2 mt-3 mx-auto">
                 <button type="submit" class="btn btn-primary">Schedule Appointment</button>
             </div>
         </div>
@@ -155,8 +211,41 @@
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
-
 <script>
+    $(document).ready(function() {
+        $('#appointment_ward').on('change', function(){
+            var ward_id = $(this).val()
+            $.ajax({
+                url: '/appointment/get_ward_price/',
+                type: 'GET',
+                dataType: 'json',
+                data: {'ward_id': ward_id},
+                success: function(data) {
+                    // Update the result div with the received data
+                    $('#hidden_ward_price').val('');
+                    $('#hidden_ward_price').val('Rs.' + data.ward_price);
+                    console.log(data.ward_id)
+                },
+                error: function(error) {
+                    console.log('Error:', error);
+                }
+            });
+        });
+    });
+
+
+
+
+
+
+
+
+
+
+
+</script>
+<script>
+
 $(document).ready(function () {
     // Target the patient name input field and the results dropdown
     var $patientNameInput = $("#patientName");
@@ -206,6 +295,17 @@ $(document).ready(function () {
         }
     });
 });
+
+
+
+
+
+
+
+
+
+
+
 
 </script>
 

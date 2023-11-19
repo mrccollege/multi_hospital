@@ -128,13 +128,10 @@ def get_mini_store_model_data(request):
     if request.method == 'GET':
         form = request.GET
         main_store_id = form.get('main_store_id')
-        print(main_store_id, '=======main_store_id')
         main_store = MainStore.objects.filter(main_store_id=main_store_id)
-        print(main_store, '==============main_store')
         mini_store_list = []
         if main_store:
             hospital_id = main_store[0].hospital_id
-            print(hospital_id, '=======hospital_id')
             if hospital_id:
                 mini_store = MiniStore.objects.filter(hospital_id=hospital_id)
                 if mini_store:
