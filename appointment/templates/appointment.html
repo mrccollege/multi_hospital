@@ -159,9 +159,9 @@
                         <label for="hidden_ward_price">Visit Type</label>
                         <select name="appointment_ward" id="appointment_ward" class="form-control">
                             <option value="">Select ward</option>
-                            <!--                            <option money="250" value="OPD 09 AM TO 01 PM ">OPD 09 AM TO 01 PM</option>-->
-                            <!--                            <option money="350" value="OPD 01 AM TO 05 PM ">OPD 01 AM TO 05 PM</option>-->
-                            <!--                            <option money="500" value="EMERGENCY Above 05 PM">EMERGENCY Above 05 PM</option>-->
+                            <!--                            <option money="250" value="OPD 09:00 AM TO 01:00 PM">OPD 09:00 AM TO 01:00 PM</option>-->
+                            <!--                            <option money="350" value="OPD 01:00 AM TO 05:00 PM">OPD 01:00 AM TO 05:00 PM</option>-->
+                            <!--                            <option money="500" value="EMERGENCY Above 05:00 PM">EMERGENCY Above 05 PM</option>-->
                             {% for ward in ward %}
                             <option value="{{ward.id}}">{{ward.type}}</option>
                             {% endfor %}

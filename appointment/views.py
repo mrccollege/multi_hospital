@@ -1,3 +1,5 @@
+import datetime
+
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from accounts.models import DoctorUser, PatientUser, HospitalUser
@@ -42,6 +44,11 @@ def patient_appointment(request):
             ward_price = ward_obj[0].price
         else:
             ward_price = None
+
+        if appointment_date:
+            appointment_date = appointment_date
+        else:
+            appointment_date = datetime.datetime.now().date()
         appoint = PatientAppointment.objects.create(hospital_id=h_id.h_id,
                                                     appoint_ward_id=appoint_ward,
                                                     patient_id=patient_id,
