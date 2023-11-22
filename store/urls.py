@@ -11,6 +11,8 @@ urlpatterns = [
     path('view_mini_stores_record/<int:mini_store_id>/<int:hospital_id>/', views.view_mini_stores_record, name='view_mini_stores_record'),
 
     path('get_mini_store_model_data/', views.get_mini_store_model_data, name='get_mini_store_model_data'),
-    path('transfer_medicine_to_mini_store/', views.transfer_medicine_to_mini_store, name='transfer_medicine_to_mini_store'),
+    path('transfer_medicine/', views.transfer_medicine, name='transfer_medicine'),
+    path('new_transfer_medicine/', views.new_transfer_medicine, name='new_transfer_medicine'),
+    path('transfer_medicine_from_mini/', views.transfer_medicine_from_mini, name='transfer_medicine_from_mini'),
     path('transfer_medicine_mini_to_mini_store/', views.transfer_medicine_mini_to_mini_store, name='transfer_medicine_mini_to_mini_store'),
 ]

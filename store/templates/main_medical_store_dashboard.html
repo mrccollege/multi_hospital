@@ -163,9 +163,10 @@
             return false;
         }
         $.ajax({
-            url: '/store/transfer_medicine_to_mini_store/',
+            url: '/store/new_transfer_medicine/',
             type: 'GET',
             data:{
+                'hospital_id': '{{hospital_id}}',
                 'main_store_id': '{{main_store_id}}',
                 'medicine_id': medicine_id,
                 'mini_store_id': mini_store_id,
@@ -174,7 +175,14 @@
             success: function (data) {
                 console.log(data)
                 if (data.status == 1){
-                    location.reload()
+                    Swal.fire({
+                      title: "Success!",
+                      text: data.msg,
+                      icon: "success"
+                    }).then((result) => {
+                      location.reload()
+                    });
+
                 }
             }
         });

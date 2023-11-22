@@ -77,8 +77,10 @@ class MappingMiniStorMedicine(models.Model):
 class MiniMedicalStoreMedicineTransactionHistory(models.Model):
     medicine_trans_id = models.AutoField(primary_key=True)
     medicine = models.ForeignKey(Medicine, on_delete=models.CASCADE)
-    main_store = models.ForeignKey(MainStore, related_name='mini_trans_main_store_user', on_delete=models.CASCADE, null=True, blank=True)
-    mini_store = models.ForeignKey(MiniStore, related_name='mini_trans_mini_store_user', on_delete=models.CASCADE, null=True, blank=True)
+    main_store = models.ForeignKey(MainStore, related_name='mini_trans_main_store_user', on_delete=models.CASCADE,
+                                   null=True, blank=True)
+    mini_store = models.ForeignKey(MiniStore, related_name='mini_trans_mini_store_user', on_delete=models.CASCADE,
+                                   null=True, blank=True)
     trans_qty = models.IntegerField()
     trans_created = models.DateField(auto_now_add=True)
     trans_update = models.DateField(null=True)
@@ -88,3 +90,23 @@ class MiniMedicalStoreMedicineTransactionHistory(models.Model):
 
     class Meta:
         db_table = 'mini_store_medicine_transaction_history'
+
+
+class TransferMedicine(models.Model):
+    mapping_id = models.AutoField(primary_key=True)
+    qty = models.IntegerField()
+    medicine = models.ForeignKey(Medicine, related_name='mapping_medicine', on_delete=models.CASCADE)
+    from_main_store = models.ForeignKey(MainStore, related_name='from_main_store', on_delete=models.CASCADE, null=True)
+    from_mini_store = models.ForeignKey(MiniStore, related_name='from_mini_store', on_delete=models.CASCADE, null=True)
+    to_main_store = models.ForeignKey(MainStore, related_name='to_main_store', on_delete=models.CASCADE, null=True)
+    to_mini_store = models.ForeignKey(MiniStore, related_name='to_mini_store', on_delete=models.CASCADE, null=True)
+    hospital = models.ForeignKey(HospitalUser, related_name='mapping_hospital', on_delete=models.CASCADE)
+
+    created_at = models.DateField(auto_now_add=True)
+    updated_at = models.DateField(null=True)
+
+    def __str__(self):
+        return str(self.medicine.name)
+
+    class Meta:
+        db_table = 'transfer_medicine'

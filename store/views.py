@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect
 
 from accounts.models import HospitalUser
 from .models import Medicine, MainStore, MainMedicalStoreMedicineTransactionHistory, MiniStore, \
-    MappingMiniStorMedicine, MiniMedicalStoreMedicineTransactionHistory
+    MappingMiniStorMedicine, MiniMedicalStoreMedicineTransactionHistory, TransferMedicine
 
 
 def main_medicine_transaction(mapping_id, qty, main_store_id):
@@ -114,8 +114,10 @@ def mini_medical_store_dashboard(request):
     else:
         mini_medical_store = MiniStore.objects.get(mini_store_user_id=mini_medical_user_id)
         mini_medical_store_id = mini_medical_store.mini_store_id
-        medicine = MappingMiniStorMedicine.objects.filter(mini_store_user_id=mini_medical_store_id)
+        hospital_id = mini_medical_store.hospital.h_id
+        medicine = TransferMedicine.objects.filter(to_mini_store_id=mini_medical_store_id)
         context = {
+            'hospital_id': hospital_id,
             'mini_medical_store_id': mini_medical_store_id,
             'mini_medical_store': mini_medical_store,
             'medicine': medicine,
@@ -128,9 +130,11 @@ def get_mini_store_model_data(request):
         form = request.GET
         main_store_id = form.get('main_store_id')
         mini_store_id = form.get('mini_medical_store_id')
+        hospital_id = form.get('hospital_id')
 
         mini_store_list = []
         if main_store_id:
+            print(main_store_id, '================main_store_id')
             main_store = MainStore.objects.filter(main_store_id=main_store_id)
             if main_store:
                 hospital_id = main_store[0].hospital_id
@@ -143,9 +147,7 @@ def get_mini_store_model_data(request):
                             data_dict['mini_store_name'] = i.mini_store_user.full_name
                             mini_store_list.append(data_dict)
         else:
-            mini_store = MiniStore.objects.filter(mini_store_id=mini_store_id)
-            if mini_store:
-                hospital_id = mini_store[0].hospital_id
+            if mini_store_id:
                 if hospital_id:
                     mini_store = MiniStore.objects.filter(hospital_id=hospital_id).exclude(mini_store_id=mini_store_id)
                     if mini_store:
@@ -173,19 +175,19 @@ def mini_medical_store_transaction_hist2(medicine_id, to_mini_store_id, medicine
                                                               trans_qty=medicine_qty)
 
 
-def transfer_medicine_to_mini_store(request):
+def transfer_medicine(request):
     if request.method == 'GET':
         form = request.GET
-        main_store_id = form.get('main_store_id')
-        mini_store_id = form.get('mini_store_id')
+        from_main_store_id = form.get('main_store_id')
+        to_mini_store_id = form.get('mini_store_id')
         medicine_id = form.get('medicine_id')
         medicine_qty = form.get('medicine_qty')
         status = 0
         msg = 'Medicine not Transferred .'
         is_exists = MappingMiniStorMedicine.objects.filter(medicine_id=medicine_id,
-                                                           mini_store_user_id=mini_store_id).exists()
+                                                           mini_store_user_id=to_mini_store_id).exists()
         if is_exists == True:
-            obj = MappingMiniStorMedicine.objects.get(medicine_id=medicine_id, mini_store_user_id=mini_store_id)
+            obj = MappingMiniStorMedicine.objects.get(medicine_id=medicine_id, mini_store_user_id=to_mini_store_id)
             obj_mini_qty = obj.mini_qty
             obj_mini_qty = int(obj_mini_qty) + int(medicine_qty)
             obj.mini_qty = obj_mini_qty
@@ -193,16 +195,16 @@ def transfer_medicine_to_mini_store(request):
         else:
             obj = MappingMiniStorMedicine.objects.create(mini_qty=medicine_qty,
                                                          medicine_id=medicine_id,
-                                                         mini_store_user_id=mini_store_id
+                                                         mini_store_user_id=to_mini_store_id
                                                          )
         if obj:
-            mini_medical_store_transaction_hist1(medicine_id, main_store_id, medicine_qty)
+            mini_medical_store_transaction_hist1(medicine_id, from_main_store_id, medicine_qty)
 
-            medicine = Medicine.objects.filter(medicine_id=medicine_id, main_store_id=main_store_id)
+            medicine = Medicine.objects.filter(medicine_id=medicine_id, main_store_id=from_main_store_id)
             if medicine:
                 medicine = medicine[0].qty
                 qty = int(medicine) - int(medicine_qty)
-            obj = Medicine.objects.filter(medicine_id=medicine_id, main_store_id=main_store_id).update(qty=qty)
+            obj = Medicine.objects.filter(medicine_id=medicine_id, main_store_id=from_main_store_id).update(qty=qty)
             if obj:
                 status = 1
                 msg = 'medicine transfer to mini store successfully.'
@@ -278,3 +280,141 @@ def view_mini_stores_record(request, mini_store_id, hospital_id):
                 'medicine': medicine,
             }
             return render(request, 'mini_store_record.html', context)
+
+
+# -------------------------------------------------------------------
+def new_transfer_medicine(request):
+    if request.method == 'GET':
+        form = request.GET
+        hospital_id = form.get('hospital_id')
+        from_main_store_id = form.get('main_store_id')
+        to_mini_store_id = form.get('mini_store_id')
+        medicine_id = form.get('medicine_id')
+        medicine_qty = form.get('medicine_qty')
+        status = 0
+        msg = 'Medicine not Transferred .'
+
+        already_exists = TransferMedicine.objects.filter(medicine_id=medicine_id,
+                                                         from_main_store_id=from_main_store_id,
+                                                         to_mini_store_id=to_mini_store_id,
+                                                         hospital_id=hospital_id
+                                                         ).exists()
+
+        print(already_exists, '==================already_exists1')
+        if already_exists:
+            print(already_exists, '==================already_exists2')
+            transferred_obj = TransferMedicine.objects.get(medicine_id=medicine_id,
+                                                           from_main_store_id=from_main_store_id,
+                                                           to_mini_store_id=to_mini_store_id,
+                                                           hospital_id=hospital_id
+                                                           )
+
+            qty = transferred_obj.qty
+            qty = int(qty) + int(medicine_qty)
+            obj = TransferMedicine.objects.filter(medicine_id=medicine_id,
+                                                  from_main_store_id=from_main_store_id,
+                                                  to_mini_store_id=to_mini_store_id,
+                                                  hospital_id=hospital_id
+                                                  ).update(qty=qty)
+
+            if obj:
+                medicine_obj = Medicine.objects.get(main_store_id=from_main_store_id)
+                qty = medicine_obj.qty
+                qty = int(qty) - int(medicine_qty)
+                Medicine.objects.filter(main_store_id=from_main_store_id).update(qty=qty)
+                status = 1
+                msg = 'Medicine Transferred. successfully.'
+        else:
+            obj = TransferMedicine.objects.create(qty=medicine_qty,
+                                                  medicine_id=medicine_id,
+                                                  from_main_store_id=from_main_store_id,
+                                                  to_mini_store_id=to_mini_store_id,
+                                                  hospital_id=hospital_id,
+                                                  from_mini_store_id=None,
+                                                  to_main_store_id=None,
+                                                  )
+            if obj:
+                medicine_obj = Medicine.objects.get(main_store_id=from_main_store_id)
+                qty = medicine_obj.qty
+                qty = int(qty) - int(medicine_qty)
+                Medicine.objects.filter(main_store_id=from_main_store_id).update(qty=qty)
+                status = 1
+                msg = 'Medicine Transferred. successfully.'
+
+        context = {
+            'status': status,
+            'msg': msg,
+        }
+        return JsonResponse(context)
+
+
+def transfer_medicine_from_mini(request):
+    if request.method == 'GET':
+        form = request.GET
+        hospital_id = form.get('hospital_id')
+        from_mini_store = form.get('from_mini_medical_store_id')
+        to_mini_store = form.get('to_mini_store_id')
+        medicine_id = form.get('medicine_id')
+        medicine_qty = form.get('medicine_qty')
+        status = 0
+        msg = 'Medicine not Transferred .'
+
+        obj = TransferMedicine.objects.filter(medicine_id=medicine_id,
+                                              to_mini_store_id=to_mini_store,
+                                              hospital_id=hospital_id,
+                                              ).exists()
+        if obj:
+            obj = TransferMedicine.objects.get(medicine_id=medicine_id,
+                                               to_mini_store_id=to_mini_store,
+                                               hospital_id=hospital_id,
+                                               )
+            qty = obj.qty
+            qty = int(qty) + int(medicine_qty)
+            trans_obj = TransferMedicine.objects.filter(medicine_id=medicine_id,
+                                                        to_mini_store_id=to_mini_store,
+                                                        hospital_id=hospital_id,
+                                                        ).update(qty=qty)
+            if trans_obj:
+                obj = TransferMedicine.objects.get(medicine_id=medicine_id,
+                                                   to_mini_store_id=from_mini_store,
+                                                   hospital_id=hospital_id,
+                                                   )
+                qty = obj.qty
+                qty = int(qty) - int(medicine_qty)
+                trans_obj = TransferMedicine.objects.filter(medicine_id=medicine_id,
+                                                            to_mini_store_id=from_mini_store,
+                                                            hospital_id=hospital_id,
+                                                            ).update(qty=qty)
+
+                if trans_obj:
+                    status = 1
+                    msg = 'Medicine Transferred. successfully.'
+        else:
+            obj = TransferMedicine.objects.create(qty=medicine_qty,
+                                                  medicine_id=medicine_id,
+                                                  from_mini_store_id=from_mini_store,
+                                                  to_mini_store_id=to_mini_store,
+                                                  from_main_store_id=None,
+                                                  to_main_store_id=None,
+                                                  hospital_id=hospital_id,
+                                                  )
+            if obj:
+                trans_obj = TransferMedicine.objects.get(medicine_id=medicine_id,
+                                                         to_mini_store_id=from_mini_store,
+                                                         hospital_id=hospital_id,
+                                                         )
+                qty = trans_obj.qty
+                qty = int(qty) - int(medicine_qty)
+                trans_obj = TransferMedicine.objects.filter(medicine_id=medicine_id,
+                                                            to_mini_store_id=from_mini_store,
+                                                            hospital_id=hospital_id,
+                                                            ).update(qty=qty)
+                if trans_obj:
+                    status = 1
+                    msg = 'Medicine Transferred. successfully.'
+
+        context = {
+            'status': status,
+            'msg': msg,
+        }
+        return JsonResponse(context)

@@ -61,7 +61,7 @@
         <tr>
             <td>{{ medicine.medicine.name }}</td>
             <td>{{ medicine.medicine.batch_no }}</td>
-            <td>{{ medicine.mini_qty }}</td>
+            <td>{{ medicine.qty }}</td>
             <td>{{ medicine.medicine.price }}</td>
             <td>{{ medicine.medicine.expiration }}</td>
             <td>{{ mini_medical_store.hospital.user.full_name }}</td>
@@ -92,9 +92,11 @@
         $.ajax({
             url: '/store/get_mini_store_model_data/',
             type: 'GET',
-            data:{mini_medical_store_id:'{{mini_medical_store_id}}'},
+            data:{
+                'mini_medical_store_id':'{{mini_medical_store_id}}',
+                'hospital_id':'{{hospital_id}}',
+            },
             success: function (data) {
-                console.log(data,'=============data')
                 var select = $('#selectOptions');
                 select.empty();
                 $.each(data.mini_store, function (index, item) {
@@ -111,7 +113,6 @@
         var medicine_id = $('#hidden_medicine_id').val()
         var to_mini_store_id = $('#selectOptions').val()
         var medicine_qty = parseInt($('#medicine_qty').val())
-        console.log(medicine_qty, '==========medicine_qty')
         var hidden_medicine_qty = parseInt($('#hidden_medicine_qty').val())
         if (hidden_medicine_qty < 1){
             Swal.fire({
@@ -150,9 +151,10 @@
             return false;
         }
         $.ajax({
-            url: '/store/transfer_medicine_mini_to_mini_store/',
+            url: '/store/transfer_medicine_from_mini/',
             type: 'GET',
             data:{
+                'hospital_id': '{{hospital_id}}',
                 'from_mini_medical_store_id': '{{mini_medical_store_id}}',
                 'medicine_id': medicine_id,
                 'to_mini_store_id': to_mini_store_id,
