@@ -44,9 +44,9 @@
         <thead>
         <tr>
             <th>Name</th>
-            <th>Qty</th>
-            <th>Price</th>
-            <th>Expiration</th>
+            <th>Contact</th>
+            <th>Address</th>
+            <th>Doctor</th>
             <th>Hospital</th>
             <th>Action</th>
         </tr>
@@ -56,10 +56,10 @@
             {% for patient_bill in patient_bill %}
             <tr>
                 <td>{{ patient_bill.appointment.patient.user.full_name }}</td>
-                <td>{{ patient_bill.mini_qty }}</td>
-                <td>{{ patient_bill.medicine.medicine.price }}</td>
-                <td>{{ patient_bill.medicine.medicine.expiration }}</td>
-                <td>{{ patient_bill.medicine.medicine.hospital }}</td>
+                <td>{{ patient_bill.appointment.patient.user.mobile }}</td>
+                <td>{{ patient_bill.appointment.patient.user.address }}</td>
+                <td>{{ patient_bill.appointment.doctor.user.full_name }}</td>
+                <td>{{ patient_bill.appointment.hospital.user.full_name }}</td>
                 <td><a href="/billing/generate_bill/{{patient_bill.head_id}}/" target="_blank">view</a></td>
             </tr>
             {% endfor %}

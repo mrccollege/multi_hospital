@@ -47,6 +47,20 @@ class DoctorUser(models.Model):
         return str(self.user.username)
 
 
+class Stores(models.Model):
+    hospital = models.ForeignKey(HospitalUser, related_name='stores_hospital', on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, related_name='stores_user', on_delete=models.CASCADE)
+    store_type = models.CharField(max_length=50)
+    created_at = models.DateField(auto_now_add=True)
+    updated_at = models.DateField(null=True)
+
+    def __str__(self):
+        return str(self.user.full_name)
+
+    class Meta:
+        db_table = 'stores'
+
+
 class SocialMediaReference(models.Model):
     type_reference = models.CharField(max_length=50)
     hospital = models.ForeignKey(HospitalUser, related_name='social_ref_hospital', on_delete=models.CASCADE)

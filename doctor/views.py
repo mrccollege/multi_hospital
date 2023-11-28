@@ -8,27 +8,6 @@ from appointment.models import PatientAppointment
 from patient_report.models import HeaderPatient, DetailsPatient
 
 
-@login_required(login_url='/doctor/login/')
-def doctor_dashboard(request):
-    doctor_user_id = ''
-    try:
-        doctor_user_id = request.session['doctor_user_id']
-    except Exception as e:
-        print(e, '========e=========')
-
-    if doctor_user_id:
-        doctor_details = DoctorUser.objects.get(user_id=doctor_user_id)
-        appoint = PatientAppointment.objects.filter(doctor__user_id=doctor_user_id, appoint_status='unchecked', hospital_id=doctor_details.hospital.h_id)
-        context = {
-            'hospital_id': doctor_details.hospital.h_id,
-            'doctor_details': doctor_details,
-            'appoint': appoint
-        }
-        return render(request, 'doctor_dashboard.html', context)
-    else:
-        return redirect('/doctor/login/')
-
-
 def doctor_login(request):
     if request.method == 'POST':
         form = request.POST
@@ -54,6 +33,28 @@ def doctor_login(request):
     return render(request, 'doctor_login.html')
 
 
+@login_required(login_url='/doctor/login/')
+def doctor_dashboard(request):
+    doctor_user_id = ''
+    try:
+        doctor_user_id = request.session['doctor_user_id']
+    except Exception as e:
+        print(e, '========e=========')
+
+    if doctor_user_id:
+        doctor_details = DoctorUser.objects.get(user_id=doctor_user_id)
+        appoint = PatientAppointment.objects.filter(doctor__user_id=doctor_user_id, appoint_status='unchecked',
+                                                    hospital_id=doctor_details.hospital.h_id)
+        context = {
+            'hospital_id': doctor_details.hospital.h_id,
+            'doctor_details': doctor_details,
+            'appoint': appoint
+        }
+        return render(request, 'doctor_dashboard.html', context)
+    else:
+        return redirect('/doctor/login/')
+
+
 def doctor_logout(request):
     logout(request)
     return redirect('/doctor/login/')
@@ -71,7 +72,7 @@ def patient_report(request, appointment_id):
         dosage = form.getlist('dosage')
         frequency = form.getlist('frequency')
         head = HeaderPatient.objects.create(appointment_id=appointment_id,
-                                            disease=[disease],
+                                            disease=disease,
                                             )
         if head:
             PatientAppointment.objects.filter(patient_appoint_id=appointment_id).update(appoint_status='checked')

@@ -1,8 +1,6 @@
 from django.contrib import admin
-from .models import PatientBillHistory, PatientBillHistoryHead, PatientBillHistoryDetails
+from .models import PatientBillHistoryHead, PatientBillHistoryDetails
 
-# Register your models here.\
-
-admin.site.register(PatientBillHistory)
+# Register your models here.
 admin.site.register(PatientBillHistoryHead)
 admin.site.register(PatientBillHistoryDetails)

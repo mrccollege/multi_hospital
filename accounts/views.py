@@ -1,15 +1,11 @@
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth import login, authenticate, logout
 from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
+from .models import CustomUser, HospitalUser, SocialMediaReference, DoctorUser, Stores, PatientUser, OtherReference
+
 
 # Create your views here.
-from site_settings.models import LookupField
-from store.models import MainStore, MiniStore
-from .models import CustomUser, HospitalUser, DoctorUser, PatientUser, SocialMediaReference, OtherReference
-
-
 def hospital_registration(request):
     if request.method == 'POST':
         form = request.POST
@@ -65,11 +61,6 @@ def hospital_login(request):
         return render(request, 'hospital_login.html')
 
 
-def user_logout(request):
-    logout(request)
-    return redirect('/')
-
-
 def doctor_registration(request):
     if request.method == 'POST':
         hospital_user_id = request.session.get('hospital_user_id')
@@ -109,6 +100,108 @@ def doctor_registration(request):
         else:
             return render(request, 'doctor_registration.html')
 
+
+def main_medical_store_registration(request):
+    if request.method == 'POST':
+        form = request.POST
+        medical_name = form.get('medicalName')
+        medical_name = medical_name.title()
+        email = form.get('email')
+        password = form.get('password')
+        user_type = 'MAIN_MEDICAL_STORE'
+        user = CustomUser.objects.create_user(full_name=medical_name,
+                                              username=email,
+                                              email=email,
+                                              password=password,
+                                              user_type=user_type,
+                                              )
+        if user:
+            hospital_user_id = request.session.get('hospital_user_id')
+            h_id = HospitalUser.objects.get(user_id=hospital_user_id)
+            obj = Stores.objects.create(user_id=user.id, hospital_id=h_id.h_id, store_type=user_type)
+            if obj:
+                return redirect('/dashboard/hospital/')
+
+    return render(request, 'main_medical_store_register.html')
+
+
+def mini_medical_store_registration(request):
+    if request.method == 'POST':
+        form = request.POST
+        medical_name = form.get('medicalName')
+        medical_name = medical_name.title()
+        email = form.get('email')
+        password = form.get('password')
+        user_type = 'MINI_MEDICAL_STORE'
+        user = CustomUser.objects.create_user(full_name=medical_name,
+                                              username=email,
+                                              email=email,
+                                              password=password,
+                                              user_type=user_type,
+                                              )
+        if user:
+            hospital_user_id = request.session.get('hospital_user_id')
+            h_id = HospitalUser.objects.get(user_id=hospital_user_id)
+            obj = Stores.objects.create(user_id=user.id, hospital_id=h_id.h_id, store_type=user_type)
+            if obj:
+                return redirect('/dashboard/hospital/')
+
+    return render(request, 'mini_medical_store_register.html')
+
+
+def main_medical_store_login(request):
+    if request.method == 'POST':
+        form = request.POST
+        username = form.get('email')
+        password = form.get('password')
+
+        username = username.strip()
+        password = password.strip()
+        try:
+            user = CustomUser.objects.filter(username=username).first()
+        except Exception as e:
+            print(e, '===========e==========')
+            user = None
+
+        if user is not None:
+            if user.user_type == 'MAIN_MEDICAL_STORE':
+                user = authenticate(username=username, password=password)
+                login(request, user)
+                request.session['main_medical_user_id'] = user.id
+                return redirect('/store/main_medical_store_dashboard/')
+        else:
+            error_message = "Invalid username or password"
+    return render(request, 'main_medical_store_login.html')
+
+
+def mini_medical_store_login(request):
+    if request.method == 'POST':
+        form = request.POST
+        username = form.get('email')
+        password = form.get('password')
+
+        username = username.strip()
+        password = password.strip()
+        try:
+            user = CustomUser.objects.filter(username=username).first()
+        except Exception as e:
+            print(e, '===========e==========')
+            user = None
+
+        if user is not None:
+            if user.user_type == 'MINI_MEDICAL_STORE':
+                user = authenticate(username=username, password=password)
+                login(request, user)
+                request.session['mini_medical_user_id'] = user.id
+                return redirect('/store/mini_medical_store_dashboard/')
+        else:
+            error_message = "Invalid username or password"
+    return render(request, 'mini_medical_store_login.html')
+
+
+def user_logout(request):
+    logout(request)
+    return redirect('/')
 
 
 def add_reference(request):
@@ -164,7 +257,7 @@ def get_patient_reference(request):
 def patient_registration(request):
     hospital_user_id = request.session.get('hospital_user_id')
     if hospital_user_id is None:
-            return redirect('/accounts/hospital-login/')
+        return redirect('/accounts/hospital-login/')
     h_id = HospitalUser.objects.get(user_id=hospital_user_id)
 
     if request.method == 'POST':
@@ -225,101 +318,3 @@ def patient_registration(request):
             'other_ref': other_ref,
         }
         return render(request, 'patient_registration.html', context)
-
-
-def main_medical_store_registration(request):
-    if request.method == 'POST':
-        form = request.POST
-        medical_name = form.get('medicalName')
-        medical_name = medical_name.title()
-        email = form.get('email')
-        password = form.get('password')
-        user_type = 'MAIN_MEDICAL_STORE'
-        user = CustomUser.objects.create_user(full_name=medical_name,
-                                              username=email,
-                                              email=email,
-                                              password=password,
-                                              user_type=user_type,
-                                              )
-        if user:
-            hospital_user_id = request.session.get('hospital_user_id')
-            h_id = HospitalUser.objects.get(user_id=hospital_user_id)
-            obj = MainStore.objects.create(main_store_user_id=user.id, hospital_id=h_id.h_id)
-            if obj:
-                return redirect('/dashboard/hospital/')
-
-    return render(request, 'main_medical_store_register.html')
-
-
-def main_medical_store_login(request):
-    if request.method == 'POST':
-        form = request.POST
-        username = form.get('email')
-        password = form.get('password')
-
-        username = username.strip()
-        password = password.strip()
-        try:
-            user = CustomUser.objects.filter(username=username).first()
-        except Exception as e:
-            print(e, '===========e==========')
-            user = None
-
-        if user is not None:
-            if user.user_type == 'MAIN_MEDICAL_STORE':
-                user = authenticate(username=username, password=password)
-                login(request, user)
-                request.session['main_medical_user_id'] = user.id
-                return redirect('/store/main_medical_store_dashboard/')
-        else:
-            error_message = "Invalid username or password"
-    return render(request, 'main_medical_store_login.html')
-
-
-def mini_medical_store_registration(request):
-    if request.method == 'POST':
-        form = request.POST
-        medical_name = form.get('medicalName')
-        medical_name = medical_name.title()
-        email = form.get('email')
-        password = form.get('password')
-        user_type = 'MINI_MEDICAL_STORE'
-        user = CustomUser.objects.create_user(full_name=medical_name,
-                                              username=email,
-                                              email=email,
-                                              password=password,
-                                              user_type=user_type,
-                                              )
-        if user:
-            hospital_user_id = request.session.get('hospital_user_id')
-            h_id = HospitalUser.objects.get(user_id=hospital_user_id)
-            obj = MiniStore.objects.create(mini_store_user_id=user.id, hospital_id=h_id.h_id)
-            if obj:
-                return redirect('/dashboard/hospital/')
-
-    return render(request, 'mini_medical_store_register.html')
-
-
-def mini_medical_store_login(request):
-    if request.method == 'POST':
-        form = request.POST
-        username = form.get('email')
-        password = form.get('password')
-
-        username = username.strip()
-        password = password.strip()
-        try:
-            user = CustomUser.objects.filter(username=username).first()
-        except Exception as e:
-            print(e, '===========e==========')
-            user = None
-
-        if user is not None:
-            if user.user_type == 'MINI_MEDICAL_STORE':
-                user = authenticate(username=username, password=password)
-                login(request, user)
-                request.session['mini_medical_user_id'] = user.id
-                return redirect('/store/mini_medical_store_dashboard/')
-        else:
-            error_message = "Invalid username or password"
-    return render(request, 'mini_medical_store_login.html')

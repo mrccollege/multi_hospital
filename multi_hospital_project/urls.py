@@ -2,17 +2,15 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('home_page.urls')),
     path('accounts/', include('accounts.urls')),
+    path('dashboard/', include('dashboard.urls')),
     path('appointment/', include('appointment.urls')),
     path('doctor/', include('doctor.urls')),
-    path('dashboard/', include('dashboard.urls')),
-    path('store/', include('store.urls')),
     path('patient_report/', include('patient_report.urls')),
+    path('store/', include('store.urls')),
     path('billing/', include('billing.urls')),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

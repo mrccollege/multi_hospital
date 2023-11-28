@@ -1,34 +1,25 @@
 from django.contrib import admin
-from .models import MiniStore, MainStore, Medicine, MappingMiniStorMedicine, \
-    MainMedicalStoreMedicineTransactionHistory, MiniMedicalStoreMedicineTransactionHistory, TransferMedicine
+from .models import Medicine, MainStoreMedicine, MiniStoreMedicine, MedicineTransferHistory
 
 
 # Register your models here.
-class TransferMedicineAdmin(admin.ModelAdmin):
-    list_display = ['mapping_id', 'qty', 'medicine', 'from_main_store', 'from_mini_store', 'to_main_store',
-                    'to_mini_store', 'hospital']
-
-
-class MainStoreAdmin(admin.ModelAdmin):
-    list_display = ['main_store_id', 'main_store_user', 'hospital']
-
-
-class MiniStoreAdmin(admin.ModelAdmin):
-    list_display = ['mini_store_id', 'mini_store_user', 'hospital']
-
-
 class MedicineAdmin(admin.ModelAdmin):
-    list_display = ['medicine_id', 'name', 'description', 'price', 'expiration', 'manufacturer', 'main_store']
+    list_display = ['batch_no', 'name', 'price', 'expiration', 'manufacturer', 'main_store']
 
 
-class MappingMiniStorMedicineAdmin(admin.ModelAdmin):
-    list_display = ['mapping_id', 'mini_qty', 'medicine', 'mini_store_user', ]
+class MainStoreMedicineAdmin(admin.ModelAdmin):
+    list_display = ['medicine', 'qty', 'from_mini_store', 'to_main_store', 'hospital', 'created_at']
 
 
-admin.site.register(TransferMedicine, TransferMedicineAdmin)
-admin.site.register(MainStore, MainStoreAdmin)
-admin.site.register(MiniStore, MiniStoreAdmin)
+class MiniStoreMedicineAdmin(admin.ModelAdmin):
+    list_display = ['medicine', 'qty', 'from_store', 'to_store', 'hospital', 'created_at']
+
+
+class HistoryAdmin(admin.ModelAdmin):
+    list_display = ['medicine', 'qty', 'from_store', 'to_store', 'hospital', 'created_at']
+
+
 admin.site.register(Medicine, MedicineAdmin)
-admin.site.register(MappingMiniStorMedicine, MappingMiniStorMedicineAdmin)
-admin.site.register(MainMedicalStoreMedicineTransactionHistory)
-admin.site.register(MiniMedicalStoreMedicineTransactionHistory)
+admin.site.register(MainStoreMedicine, MainStoreMedicineAdmin)
+admin.site.register(MiniStoreMedicine, MiniStoreMedicineAdmin)
+admin.site.register(MedicineTransferHistory, HistoryAdmin)

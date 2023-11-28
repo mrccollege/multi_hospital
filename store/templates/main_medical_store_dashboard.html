@@ -41,7 +41,7 @@
 <div class="container mt-4">
     <div class="row">
         <div class="col-lg-6">
-            <h2>{{main_medical_store.main_store_user.full_name}}</h2>
+            <h2>{{main_medical_store.user.full_name}}</h2>
             <a href="/store/add_medicine/{{main_store_id}}/" target="_blank" class="btn btn-primary" id="add_medicine">Add Medicine</a>
             <a href="/billing/patient_billing_list/" target="_blank" class="btn btn-primary" id="generate_bill">Generate Bill</a>
         </div>
@@ -50,7 +50,7 @@
             <select name="mini_stores_list" id="mini_stores_list" class="form-control" onchange="get_mini_store_records()">
                 <option value="">Select Mini Stores</option>
                 {% for mini_stores in mini_stores %}
-                <option value="{{mini_stores.mini_store_id}}">{{mini_stores.mini_store_user.full_name}}</option>
+                <option value="{{mini_stores.id}}">{{mini_stores.user.full_name}}</option>
                 {% endfor %}
             </select>
         </div>
@@ -70,15 +70,15 @@
         <tbody>
         {% for medicine in medicine %}
         <tr>
-            <td>{{ medicine.name }}</td>
-            <td>{{ medicine.batch_no }}</td>
+            <td>{{ medicine.medicine.name }}</td>
+            <td>{{ medicine.medicine.batch_no }}</td>
             <td>{{ medicine.qty }}</td>
-            <td>{{ medicine.price }}</td>
-            <td>{{ medicine.expiration }}</td>
-            <td>{{ medicine.main_store.hospital.user.full_name }}</td>
+            <td>{{ medicine.medicine.price }}</td>
+            <td>{{ medicine.medicine.expiration }}</td>
+            <td>{{ medicine.hospital.user.full_name }}</td>
             <td>
                 <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                        onclick="transfer_medicine('{{medicine.medicine_id}}', '{{medicine.qty}}')" data-bs-target="#userInfoModal">Transfer
+                        onclick="transfer_medicine('{{medicine.medicine.medicine_id}}', '{{medicine.qty}}')" data-bs-target="#userInfoModal">Transfer
                 </button>
             </td>
 
@@ -105,7 +105,9 @@
         $.ajax({
             url: '/store/get_mini_store_model_data/',
             type: 'GET',
-            data:{main_store_id:'{{main_store_id}}'},
+            data:{main_store_id:'{{main_store_id}}',
+                 'hospital_id':'{{hospital_id}}',
+            },
             success: function (data) {
                 console.log(data,'=============data')
                 var select = $('#selectOptions');
@@ -124,7 +126,6 @@
         var medicine_id = $('#hidden_medicine_id').val()
         var mini_store_id = $('#selectOptions').val()
         var medicine_qty = parseInt($('#medicine_qty').val())
-        console.log(medicine_qty, '==========medicine_qty')
         var hidden_medicine_qty = parseInt($('#hidden_medicine_qty').val())
         if (hidden_medicine_qty < 1){
             Swal.fire({
@@ -163,7 +164,7 @@
             return false;
         }
         $.ajax({
-            url: '/store/new_transfer_medicine/',
+            url: '/store/transfer_medicine_from_main_to_mini/',
             type: 'GET',
             data:{
                 'hospital_id': '{{hospital_id}}',

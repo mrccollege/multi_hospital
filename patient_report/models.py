@@ -1,5 +1,6 @@
 from django.db import models
 
+# Create your models here.
 from appointment.models import PatientAppointment
 from store.models import Medicine
 

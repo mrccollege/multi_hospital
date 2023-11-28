@@ -12,7 +12,8 @@ def patient_history_report(request, appoint_id):
     medicine_history_date = ''
     if head:
         medicine_history_date = DetailsPatient.objects.filter(header_id=head[0].head_id).values_list('created_date',
-                                                                                                     flat=True).distinct()[:10]
+                                                                                                     flat=True).distinct()[
+                                :10]
         if medicine_history_date:
             medicine_history_date = medicine_history_date
 
