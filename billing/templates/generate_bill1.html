@@ -242,7 +242,7 @@
             success: function(response) {
                 var store_stock_qty = parseInt(response.store_qty)
                 var msg_text = 'In stock have only ' + store_stock_qty + ' quantity.';
-                if(response.store_qty !< 0){
+                if(response.store_qty > 0){
                     if (qty > store_stock_qty){
                         Swal.fire({
                           title: "Error!",
