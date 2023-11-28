@@ -13,7 +13,7 @@ SECRET_KEY = 'django-insecure-4a!x$8fn3v)ew1ttospgs+io3snh=y5%3-i-%#!w09$aza-)ic
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*', 'mrccollege.in', 'www.mrccollege.in']
 
 # Application definition
 
@@ -68,10 +68,21 @@ WSGI_APPLICATION = 'multi_hospital_project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'multi_hospi',
+        'USER': 'root',
+        'PASSWORD': 'Hello123456#',
+        'HOST': 'localhost',
+        'PORT': '3306',
     }
 }
 
