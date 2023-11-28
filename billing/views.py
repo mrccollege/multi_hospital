@@ -40,8 +40,9 @@ def send_pdf_email(bill_history_id):
 
     # Generate a temporary PDF file
     pdf_output_path = 'output.pdf'
-    generate_pdf(html_content, pdf_output_path)
 
+    generate_pdf(html_content, pdf_output_path)
+    os.chmod(pdf_output_path, 0o777)
     # Create the EmailMessage object without text_content
     subject = 'Your Email Subject'
     from_email = 'sanjay.singh@crebritech.com'
