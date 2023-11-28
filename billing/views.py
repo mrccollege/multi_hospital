@@ -222,13 +222,15 @@ def generated_bill(request, id=0):
                     header = HeaderPatient.objects.filter(head_id=head_id).update(bill_status='billed')
                     if header:
                         # this is function to send pdf
-                        # try:
-                        #     send_pdf_email(history.head_id)
-                        # except Exception as e:
-                        #     print(e, '=======e==========in generated_bill function')
+                        try:
+                            send_pdf_email(history.head_id)
+                            msg = 'Bill Generated Successfully '
+                        except Exception as e:
+                            print(e, '=======e==========in generated_bill function')
+                            msg = str(e)
 
                         # end this is function to send pdf
-                        msg = 'Bill Generated Successfully '
+                        msg = msg
                         status = 1
                         bill_id = history.head_id
                 else:
@@ -368,11 +370,13 @@ def new_customer_generate_bill(request, bill_id):
 
                         loop_count += 1
                 if loop_count > 0:
-                    # try:
-                    #     send_pdf_email(history.head_id)
-                    # except Exception as e:
-                    #     print(e, '=======e==========in generated_bill function')
-                    msg = 'Bill Generated Successfully '
+                    try:
+                        send_pdf_email(history.head_id)
+                        msg = 'Bill Generated Successfully '
+                    except Exception as e:
+                        print(e, '=======e==========in generated_bill function')
+                        msg = str(e)
+                    msg = msg
                     status = 1
                 else:
                     PatientBillHistoryHead.objects.get(head_id=history.head_id).delete()
