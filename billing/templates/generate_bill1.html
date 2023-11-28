@@ -8,6 +8,27 @@
     <title>Document</title>
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <style>
+        /* Add styling for your loader */
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none; /* Hide the loader by default */
+        }
+
+        /* Style the loader's content (e.g., a spinning icon or text) */
+        .loader img {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            /* Add more styling as needed */
+        }
+    </style>
 </head>
 <body>
 <!------ Include the above in your HEAD tag ---------->
@@ -115,7 +136,9 @@
         </div>
     </div>
 </div>
-
+<div class="loader">
+    <img alt="Loading" height="50" src="{{loader}}">
+</div>
 <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
@@ -262,6 +285,7 @@
     function print_bill() {
         var formData = $('#patient_report_form').serialize();
         var bill_id = $('#bill_id').val();
+        $('.loader').show();
         $.ajax({
             url: '/billing/generated_bill/' + bill_id + '/',
             type: 'POST',
@@ -275,7 +299,8 @@
                       text: msg_text,
                       icon: "success"
                     }).then((result) => {
-                      window.location.href = '/billing/generated_billing_list/'
+                      //window.location.href = '/billing/view_invoice/'+response.bill_id+'/'
+                        window.location.href = '/billing/generated_billing_list/'
                     });
                 }
 
@@ -292,6 +317,10 @@
             },
             error: function(error) {
                 console.log('Error:', error);
+            },
+            complete: function() {
+                // Hide the loader when the AJAX request is complete
+                $('.loader').hide();
             }
         });
     }

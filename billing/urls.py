@@ -10,4 +10,6 @@ urlpatterns = [
     path('new_customer_bill/', views.new_customer_bill, name='new_customer_bill'),
     path('new_customer_generate_bill/<int:bill_id>/', views.new_customer_generate_bill, name='new_customer_generate_bill'),
 
+    path('view_invoice/<int:bill_id>/', views.view_invoice, name='view_invoice'),
+
 ]

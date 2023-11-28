@@ -5,9 +5,79 @@ from django.shortcuts import render, redirect
 
 # Create your views here.
 from accounts.models import Stores
+from site_settings.models import LookupField
 from store.models import MainStoreMedicine, MiniStoreMedicine
 from .models import PatientBillHistoryHead, PatientBillHistoryDetails
 from patient_report.models import HeaderPatient, DetailsPatient
+
+import os
+
+from django.shortcuts import render
+from django.template.loader import render_to_string
+from django.http import HttpResponse
+from django.core.mail import EmailMessage
+from xhtml2pdf import pisa
+
+
+def generate_pdf(html_content, output_path):
+    """
+    Generate a PDF file from HTML content and save it to the specified path using pisa.
+    """
+    with open(output_path, 'w+b') as pdf_file:
+        pisa.CreatePDF(html_content, dest=pdf_file)
+
+
+def send_pdf_email(bill_history_id):
+    # Your email template data
+    header = PatientBillHistoryHead.objects.get(head_id=bill_history_id)
+    details = PatientBillHistoryDetails.objects.filter(head_id=bill_history_id)
+    context = {
+        'header': header,
+        'details': details,
+    }
+    # Render the HTML template with the data
+    html_content = render_to_string('email_template.html', context)
+
+    # Generate a temporary PDF file
+    pdf_output_path = 'output.pdf'
+    generate_pdf(html_content, pdf_output_path)
+
+    # Create the EmailMessage object without text_content
+    subject = 'Your Email Subject'
+    from_email = 'sanjay.singh@crebritech.com'
+    to_email = 'srbc500@gmail.com'
+
+    email_message = EmailMessage(
+        subject,
+        '',
+        from_email,
+        [to_email],
+        headers={'Message-ID': 'foo'},
+    )
+
+    # Attach the PDF file
+    with open(pdf_output_path, 'rb') as pdf_file:
+        email_message.attach('output.pdf', pdf_file.read(), 'application/pdf')
+
+    # Send the email
+    email_message.send()
+
+    # Delete the temporary PDF file
+    os.remove(pdf_output_path)
+
+    return HttpResponse('Email sent successfully')
+
+
+def view_invoice(request, bill_id):
+    header = PatientBillHistoryHead.objects.get(head_id=bill_id)
+    details = PatientBillHistoryDetails.objects.filter(head_id=bill_id)
+    context = {
+        'bill_id': id,
+        'header': header,
+        'details': details,
+    }
+    print(context, '===============context')
+    return render(request, 'email_template.html', context)
 
 
 def mini_store_logout(request):
@@ -54,6 +124,11 @@ def generate_bill(request, head_id):
             hospital_id = main_medical_obj[0].hospital.h_id
     else:
         return redirect('/')
+    loader = LookupField.objects.filter(title='loader')
+    if loader:
+        loader = loader[0].image.url
+    else:
+        loader = ''
 
     header = HeaderPatient.objects.get(head_id=head_id)
     details = DetailsPatient.objects.filter(header_id=head_id)
@@ -63,8 +138,8 @@ def generate_bill(request, head_id):
         'details': details,
         'store_id': store_id,
         'hospital_id': hospital_id,
+        'loader': loader,
     }
-    # return render(request, 'generate_bill.html', context)
     return render(request, 'generate_bill1.html', context)
 
 
@@ -90,7 +165,6 @@ def generated_bill(request, id=0):
         form = request.POST
 
         head_id = form.get('head_id')
-        print(head_id, '============head_id')
         patient_id = form.get('patient_id')
         hospital_id = form.get('hospital_id')
         doctor_id = form.get('doctor_id')
@@ -101,7 +175,6 @@ def generated_bill(request, id=0):
         cash_amount = form.get('cash_amount')
         online_amount = form.get('online_amount')
         remaining_amount = form.get('remaining_amount')
-        # print(medicine_ids, '===============medicine_ids')
         g_amount = int(cash_amount) + int(online_amount) + int(remaining_amount)
 
         msg = 'something went wrong!'
@@ -145,14 +218,17 @@ def generated_bill(request, id=0):
                             medicine_qty.save()
 
                         loop_count += 1
-                print(loop_count, '================loop_count')
                 if loop_count > 0:
                     header = HeaderPatient.objects.filter(head_id=head_id).update(bill_status='billed')
                     if header:
+                        # this is function to send pdf
+                        send_pdf_email(history.head_id)
+                        # end this is function to send pdf
                         msg = 'Bill Generated Successfully '
                         status = 1
                         bill_id = history.head_id
                 else:
+                    PatientBillHistoryHead.objects.get(head_id=history.head_id).delete()
                     msg = 'Bill Generated Failed!'
             else:
                 msg = 'Bill Generated Failed!'
@@ -162,7 +238,6 @@ def generated_bill(request, id=0):
             'status': status,
             'bill_id': bill_id,
         }
-        print(context, '=================context')
         return JsonResponse(context)
 
     else:
@@ -183,15 +258,25 @@ def new_customer_bill(request):
         return redirect('/')
 
     if mini_medical_user_id is not None:
-        mini_medical_user_id = Stores.objects.get(user_id=mini_medical_user_id)
+        mini_medical_user_id = Stores.objects.get(user_id=mini_medical_user_id, store_type='MINI_MEDICAL_STORE')
+        store_id = mini_medical_user_id.id
         hospital_id = mini_medical_user_id.hospital.h_id
 
     if main_medical_user_id is not None:
-        main_medical_user_id = Stores.objects.get(user_id=main_medical_user_id)
+        main_medical_user_id = Stores.objects.get(user_id=main_medical_user_id, store_type='MAIN_MEDICAL_STORE')
+        store_id = main_medical_user_id.id
         hospital_id = main_medical_user_id.hospital.h_id
 
+    loader = LookupField.objects.filter(title='loader')
+    if loader:
+        loader = loader[0].image.url
+    else:
+        loader = ''
+
     context = {
-        'hospital_id': hospital_id
+        'hospital_id': hospital_id,
+        'store_id': store_id,
+        'loader': loader,
     }
     return render(request, 'new_customer_bill.html', context)
 
@@ -235,6 +320,7 @@ def new_customer_generate_bill(request, bill_id):
 
         msg = ''
         status = 0
+        loop_count = 0
         if bill_id == 0:
             history = PatientBillHistoryHead.objects.create(header_patient_id=header_patient_id,
                                                             patient_id=patient_id,
@@ -249,7 +335,7 @@ def new_customer_generate_bill(request, bill_id):
                                                             )
             if history:
                 for i in range(len(medicine_ids)):
-                    if medicine_ids[i] and qty[i] != 0 and qty[i] == '':
+                    if medicine_ids[i] and qty[i] != '0' and qty[i]:
                         PatientBillHistoryDetails.objects.create(head_id=history.head_id,
                                                                  medicine_id=medicine_ids[i],
                                                                  qty=qty[i],
@@ -278,6 +364,11 @@ def new_customer_generate_bill(request, bill_id):
 
                         msg = 'Bill Generated Successfully '
                         status = 1
+                if loop_count > 0:
+                    send_pdf_email(history.head_id)
+                else:
+                    PatientBillHistoryHead.objects.get(head_id=history.head_id).delete()
+                    msg = 'Bill Generated Failed!'
             else:
                 msg = 'Bill Generated Failed!'
         else:

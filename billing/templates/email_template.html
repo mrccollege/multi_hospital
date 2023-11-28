@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+</head>
+<body>
+<!------ Include the above in your HEAD tag ---------->
+
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="invoice-title">
+                <h2>Invoice</h2>
+                <h3 class="pull-right">Order # 12345</h3>
+            </div>
+            <hr>
+            <div class="row">
+                <div class="col-xs-6">
+                    <p><strong>Patient Name:</strong> {{header.header_patient.appointment.patient.user.full_name|title}}</p>
+                    <p><strong>Age:</strong> {{header.header_patient.appointment.patient.user.age}}</p>
+                    <p><strong>Gender:</strong> {{header.header_patient.appointment.patient.user.gender|title}}</p>
+                    <p><strong>Contact:</strong> {{header.header_patient.appointment.patient.user.mobile}}</p>
+                    <p><strong>Address:</strong> {{header.header_patient.appointment.patient.user.address}}</p>
+                </div>
+                <div class="col-xs-6 text-right">
+                    <address>
+                        <strong>Shipped To:</strong><br>
+                        Jane Smith<br>
+                        1234 Main<br>
+                        Apt. 4B<br>
+                        Springfield, ST 54321
+                    </address>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <form id="patient_report_form" action="" method="post">{% csrf_token %}
+                    <div class="panel-heading">
+                        <div class="row">
+                            <input type="hidden" name="bill_id" id="bill_id" value="{{bill_id}}">
+                            <input type="hidden" name="head_id" value="{{header.header_patient.head_id}}">
+                            <input type="hidden" name="patient_id" value="{{header.header_patient.appointment.patient_id}}">
+                            <input type="hidden" name="hospital_id" value="{{header.header_patient.appointment.hospital_id}}">
+                            <input type="hidden" name="doctor_id" value="{{header.header_patient.appointment.doctor_id}}">
+                            <div class="col-lg-8">
+                                <div class="col-lg-4">
+                                    <label>Cash</label>
+                                    <input type="number" class="form-control" name="cash_amount" id="cash_amount"
+                                           placeholder="Enter Cash Amount" value="{{header.cash}}">
+                                </div>
+
+                                <div class="col-lg-4">
+                                    <label>Online</label>
+                                    <input type="number" class="form-control" name="online_amount" id="online_amount"
+                                           placeholder="Enter Online Amount" value="{{header.online}}">
+                                </div>
+
+                                <div class="col-lg-4">
+                                    <label>Remaining</label>
+                                    <input type="number" class="form-control" name="remaining_amount" id="remaining_amount"
+                                           value="{{header.remaining}}">
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4">
+                                <div class="col-lg-3">
+                                    <button class="btn btn-success" id="submitForm">Print</button>
+                                </div>
+
+                                <div class="col-lg-3">
+                                    <a href="/patient_report/history/{{header.appointment.patient_appoint_id}}/"
+                                       target="_blank"
+                                       class="btn btn-primary">History</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="table-responsive">
+                            <table class="table table-condensed text-center">
+                                <thead>
+                                <tr>
+                                    <th>SN.</th>
+                                    <th>Medicine Name</th>
+                                    <th colspan="1">Price</th>
+                                    <th>Qty</th>
+                                    <th>total</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for i in details %}
+                                <tr>
+                                    <td>{{forloop.counter}}</td>
+                                    <td>{{i.medicine.name}}</td>
+                                    <td>{{i.medicine.price}}</td>
+                                    <td>{{i.qty}}</td>
+                                    <td>{{i.total}}</td>
+                                </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+</body>
+</html>
