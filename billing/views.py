@@ -18,7 +18,7 @@ from django.http import HttpResponse
 from django.core.mail import EmailMessage
 from xhtml2pdf import pisa
 
-
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 def generate_pdf(html_content, output_path):
     """
     Generate a PDF file from HTML content and save it to the specified path using pisa.
@@ -39,10 +39,18 @@ def send_pdf_email(bill_history_id):
     html_content = render_to_string('email_template.html', context)
 
     # Generate a temporary PDF file
-    pdf_output_path = 'output.pdf'
+    pdf_output_path = os.path.join(BASE_DIR, 'output.pdf')
+
+    # Ensure the directory exists
+    directory = os.path.dirname(pdf_output_path)
+    if not os.path.exists(directory):
+        os.makedirs(directory)
 
     generate_pdf(html_content, pdf_output_path)
+
+    # Set file permissions
     os.chmod(pdf_output_path, 0o777)
+
     # Create the EmailMessage object without text_content
     subject = 'Your Email Subject'
     from_email = 'sanjay.singh@crebritech.com'
