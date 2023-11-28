@@ -44,11 +44,13 @@ def generate_bill(request, head_id):
         mini_medical_user_id = mini_medical_user_id
         mini_medical_obj = Stores.objects.filter(user_id=mini_medical_user_id)
         if mini_medical_obj:
+            store_id = mini_medical_obj[0].id
             hospital_id = mini_medical_obj[0].hospital.h_id
     elif main_medical_user_id is not None:
         main_medical_user_id = main_medical_user_id
         main_medical_obj = Stores.objects.filter(user_id=main_medical_user_id)
         if main_medical_obj:
+            store_id = main_medical_obj[0].id
             hospital_id = main_medical_obj[0].hospital.h_id
     else:
         return redirect('/')
@@ -59,6 +61,7 @@ def generate_bill(request, head_id):
         'head_id': head_id,
         'header': header,
         'details': details,
+        'store_id': store_id,
         'hospital_id': hospital_id,
     }
     # return render(request, 'generate_bill.html', context)
@@ -104,6 +107,7 @@ def generated_bill(request, id=0):
         msg = 'something went wrong!'
         status = 0
         bill_id = 0
+        loop_count = 0
         if id == 0:
             history = PatientBillHistoryHead.objects.create(header_patient_id=head_id,
                                                             patient_id=patient_id,
@@ -118,7 +122,7 @@ def generated_bill(request, id=0):
                                                             )
             if history:
                 for i in range(len(medicine_ids)):
-                    if medicine_ids[i]:
+                    if medicine_ids[i] and qty[i] != '0' and qty[i]:
                         PatientBillHistoryDetails.objects.create(head_id=history.head_id,
                                                                  medicine_id=medicine_ids[i],
                                                                  qty=qty[i],
@@ -140,11 +144,16 @@ def generated_bill(request, id=0):
                             medicine_qty.qty = int(medi_qty) - int(qty[i])
                             medicine_qty.save()
 
-                header = HeaderPatient.objects.filter(head_id=head_id).update(bill_status='billed')
-                if header:
-                    msg = 'Bill Generated Successfully '
-                    status = 1
-                    bill_id = history.head_id
+                        loop_count += 1
+                print(loop_count, '================loop_count')
+                if loop_count > 0:
+                    header = HeaderPatient.objects.filter(head_id=head_id).update(bill_status='billed')
+                    if header:
+                        msg = 'Bill Generated Successfully '
+                        status = 1
+                        bill_id = history.head_id
+                else:
+                    msg = 'Bill Generated Failed!'
             else:
                 msg = 'Bill Generated Failed!'
 
@@ -153,6 +162,7 @@ def generated_bill(request, id=0):
             'status': status,
             'bill_id': bill_id,
         }
+        print(context, '=================context')
         return JsonResponse(context)
 
     else:
@@ -239,7 +249,7 @@ def new_customer_generate_bill(request, bill_id):
                                                             )
             if history:
                 for i in range(len(medicine_ids)):
-                    if medicine_ids[i]:
+                    if medicine_ids[i] and qty[i] != 0 and qty[i] == '':
                         PatientBillHistoryDetails.objects.create(head_id=history.head_id,
                                                                  medicine_id=medicine_ids[i],
                                                                  qty=qty[i],

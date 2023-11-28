@@ -19,7 +19,7 @@
                     onchange="get_mini_store_records()">
                 <option value="">Select Mini Stores</option>
                 {% for mini_store in mini_store %}
-                <option value="{{mini_store.mini_store_id}}">{{mini_store.mini_store_user.full_name}}</option>
+                <option value="{{mini_store.id}}">{{mini_store.user.full_name}}</option>
                 {% endfor %}
             </select>
         </div>
@@ -41,7 +41,7 @@
         <tr>
             <td>{{ medicine.medicine.name }}</td>
             <td>{{ medicine.medicine.batch_no }}</td>
-            <td>{{ medicine.mini_qty }}</td>
+            <td>{{ medicine.qty }}</td>
             <td>{{ medicine.medicine.price }}</td>
             <td>{{ medicine.medicine.expiration }}</td>
             <td>{{ medicine.medicine.main_store.hospital.user.full_name }}</td>

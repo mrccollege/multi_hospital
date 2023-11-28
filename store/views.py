@@ -276,10 +276,52 @@ def transfer_medicine_mini_to_mini_store(request):
                     msg = 'Medicine transfer successful.'
                     status = 1
 
-        print(is_medicine, '===============is_medicine')
-
         context = {
             'msg': msg,
             'status': status
         }
         return JsonResponse(context)
+
+
+def check_medicine_qty(request):
+    if request.method == 'GET':
+        form = request.GET
+        store_id = form.get('store_id')
+        hospital_id = form.get('hospital_id')
+
+        store = MainStoreMedicine.objects.filter(to_main_store_id=store_id, hospital_id=hospital_id)
+        if store:
+            store_qty = store[0].qty
+        else:
+            store = MiniStoreMedicine.objects.filter(to_store_id=store_id, hospital_id=hospital_id)
+            store_qty = store[0].qty
+        context = {
+            'store_id': store_id,
+            'hospital_id': hospital_id,
+            'store_qty': store_qty,
+
+        }
+        return JsonResponse(context)
+
+
+def view_mini_stores_record(request, mini_store_id, hospital_id):
+    if request.method == 'GET':
+        medicine = MiniStoreMedicine.objects.filter(to_store_id=mini_store_id)
+        mini_store = Stores.objects.filter(hospital_id=hospital_id, store_type='MINI_MEDICAL_STORE')
+
+        if medicine:
+            context = {
+                'hospital_id': hospital_id,
+                'mini_store_id': mini_store_id,
+                'mini_store': mini_store,
+                'medicine': medicine,
+            }
+            return render(request, 'mini_store_record.html', context)
+        else:
+            context = {
+                'hospital_id': hospital_id,
+                'mini_store_id': mini_store_id,
+                'mini_store': mini_store,
+                'medicine': medicine,
+            }
+            return render(request, 'mini_store_record.html', context)
