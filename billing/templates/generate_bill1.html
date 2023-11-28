@@ -240,10 +240,10 @@
                 'hospital_id':'{{hospital_id}}',
             },
             success: function(response) {
-                if(response.store_qty != 0){
-                    var store_stock_qty = parseInt(response.store_qty)
+                var store_stock_qty = parseInt(response.store_qty)
+                var msg_text = 'In stock have only ' + store_stock_qty + ' quantity.';
+                if(response.store_qty !< 0){
                     if (qty > store_stock_qty){
-                        var msg_text = 'In stock have only ' + store_stock_qty + ' quantity.';
                         Swal.fire({
                           title: "Error!",
                           text: msg_text,
@@ -273,6 +273,16 @@
                         $('.g_total').html(grand_total);
                         $('#g_amount').val(grand_total);
                     }
+                }
+                else{
+                    Swal.fire({
+                      title: "Error!",
+                      text: msg_text,
+                      icon: "error"
+                    }).then((result) => {
+                      $('#qty'+index).val('')
+                      $('#total'+index).val(0)
+                    });
                 }
             },
             error: function(error) {

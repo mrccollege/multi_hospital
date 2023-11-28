@@ -288,8 +288,6 @@ def check_medicine_qty(request):
         form = request.GET
         store_id = form.get('store_id')
         hospital_id = form.get('hospital_id')
-        print(store_id, '================store_id')
-        print(hospital_id, '================hospital_id')
         store = MainStoreMedicine.objects.filter(to_main_store_id=store_id, hospital_id=hospital_id)
         if store:
             store_qty = store[0].qty
