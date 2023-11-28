@@ -251,7 +251,6 @@ def transfer_medicine_mini_to_mini_store(request):
                 status = 1
         else:
             mini_store_obj = MiniStoreMedicine.objects.get(medicine_id=medicine_id,
-                                                           from_store_id=from_store_id,
                                                            to_store_id=to_store_id,
                                                            hospital_id=hospital_id,
                                                            )
@@ -259,7 +258,6 @@ def transfer_medicine_mini_to_mini_store(request):
                 mini_medicine_qty = mini_store_obj.qty
                 qty = int(mini_medicine_qty) + int(medicine_qty)
                 mini_store_obj = MiniStoreMedicine.objects.filter(medicine_id=medicine_id,
-                                                                  from_store_id=from_store_id,
                                                                   to_store_id=to_store_id,
                                                                   hospital_id=hospital_id, ).update(qty=qty)
                 if mini_store_obj:
