@@ -104,7 +104,7 @@
                         <textarea name="complaint" id="complaint" cols="30" rows="2" class="form-control mb-1"></textarea>
                     </div>
                     <div class="col-lg-6">
-                        <label for="disease"><b>Disease</b></label>
+                        <label for="disease"><b>Disease and Uses</b></label>
                         <textarea name="disease" id="disease" cols="30" rows="2" class="form-control mb-1"></textarea>
                     </div>
                 </div>
@@ -115,7 +115,6 @@
                     <tr>
                         <th>Medicine Name</th>
                         <th>Dosage</th>
-                        <th>Frequency</th>
                     </tr>
                     </thead>
                     <tbody id="medicineTableBody">
@@ -147,8 +146,7 @@
             html += '<tr id="medicine_tr'+index+'">';
             html += '<td><input onkeyup="search_medicine('+index+');" type="text" id="medicine'+index+'" name="medicine" class="form-control" autocomplete="off" placeholder="enter medicine name"></td>';
             html += '<input type="hidden" name="medicine_id" id="medicine_id'+index+'">';
-            html += '<td><input type="text" id="dosage'+index+'" name="dosage" class="form-control" placeholder="enter dosage as 10mg"></td>';
-            html += '<td><input type="text" id="frequency'+index+'" name="frequency" class="form-control" placeholder="enter frequency Once a day"></td>';
+            html += '<td><input type="text" id="dosage'+index+'" name="dosage" class="form-control" placeholder="enter dosage and uses"></td>';
             html += '</tr>';
 
             // Append the new row to the table body
@@ -174,6 +172,7 @@
                                     label: results.name,
                                     value: results.name,
                                     id: results.id,
+                                    dosage_and_uses: results.dosage_and_uses,
                                 };
                             });
                             response(suggestedProducts);
@@ -188,6 +187,7 @@
             select: function (event, ui) {
                 // Set the selected product details in your input fields
                 $('#medicine_id' + indexID).val(ui.item.id);
+                $('#dosage' + indexID).val(ui.item.dosage_and_uses);
                 add_medicine()
             }
         });

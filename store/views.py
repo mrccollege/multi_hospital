@@ -71,6 +71,7 @@ def search_medicine(request):
             data_dict['name'] = i.name.capitalize()
             data_dict['batch_no'] = i.batch_no if i.batch_no else ''
             data_dict['price'] = i.price
+            data_dict['dosage_and_uses'] = i.dosage_and_uses
             data_list.append(data_dict)
 
         context = {

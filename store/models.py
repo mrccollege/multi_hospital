@@ -11,6 +11,7 @@ class Medicine(models.Model):
     description = models.TextField(null=True, blank=True)
     price = models.IntegerField(default=0)
     expiration = models.DateField(null=True)
+    dosage_and_uses = models.TextField(null=True, blank=True)
     manufacturer = models.CharField(max_length=100, null=True, blank=True)
     main_store = models.ForeignKey(Stores, related_name='Medicine_main_store', on_delete=models.CASCADE)
     hospital = models.ForeignKey(HospitalUser, related_name='Medicine_hospital', on_delete=models.CASCADE)
