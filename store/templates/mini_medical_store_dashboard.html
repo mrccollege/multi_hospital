@@ -30,6 +30,7 @@
 
             </div>
             <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="to_main_store" data-bs-dismiss="modal">To Main Store</button>
                 <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
                 <button type="button" class="btn btn-success" id="transfer_medicine" data-bs-dismiss="modal">Save
                 </button>
@@ -175,6 +176,72 @@
         });
     });
 
+
+
+    $('#to_main_store').click(function(){
+        var medicine_id = $('#hidden_medicine_id').val()
+        var medicine_qty = parseInt($('#medicine_qty').val())
+        var hidden_medicine_qty = parseInt($('#hidden_medicine_qty').val())
+        if (hidden_medicine_qty < 1){
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "Stock Medicine Qty is 0 please add first!",
+            });
+            return false;
+        }
+        if (medicine_qty){
+            console.log(medicine_qty, '==========medicine_qty')
+        }else{
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "Please add Medicine minimum 1 qty!",
+            });
+            return false;
+        }
+
+        if (medicine_qty < 1){
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "Medicine Qty is less than 1!",
+            });
+            return false;
+        }
+
+        if (medicine_qty > hidden_medicine_qty){
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "Medicine Qty is more than stock qty!",
+            });
+            return false;
+        }
+        $.ajax({
+            url: '/store/transfer_medicine_mini_to_main_store/',
+            type: 'GET',
+            data:{
+                'hospital_id': '{{hospital_id}}',
+                'from_mini_medical_store_id': '{{mini_medical_store_id}}',
+                'medicine_id': medicine_id,
+                'to_main_store_id': '{{main_store_id}}',
+                'medicine_qty' : medicine_qty,
+            },
+            success: function (data) {
+                console.log(data)
+                if (data.status == 1){
+                    Swal.fire({
+                      title: "Success!",
+                      text: data.msg,
+                      icon: "success"
+                    }).then((result) => {
+                      location.reload()
+                    });
+                }
+            }
+        });
+    });
 </script>
 
 <script>

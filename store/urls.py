@@ -11,5 +11,6 @@ urlpatterns = [
     path('get_mini_store_model_data/', views.get_mini_store_model_data, name='get_mini_store_model_data'),
     path('transfer_medicine_from_main_to_mini/', views.transfer_medicine_from_main_to_mini, name='transfer_medicine_from_main_to_mini'),
     path('transfer_medicine_mini_to_mini_store/', views.transfer_medicine_mini_to_mini_store, name='transfer_medicine_mini_to_mini_store'),
+    path('transfer_medicine_mini_to_main_store/', views.transfer_medicine_mini_to_main_store, name='transfer_medicine_mini_to_main_store'),
     path('check_medicine_qty/', views.check_medicine_qty, name='check_medicine_qty'),
 ]
