@@ -47,8 +47,6 @@
             background-color: #f0f0f0;
         }
 
-
-
     </style>
     <style>
         .search-results-dropdown {
@@ -69,15 +67,13 @@
             background-color: #f5f5f5;
         }
 
-
-
     </style>
 </head>
 <body>
 <div class="container">
     <div class="invoice">
         <div class="invoice-header text-center">
-            <h1>Patient Prescription</h1>
+            <h1>Patient Report</h1>
         </div>
         <div class="patient-info">
             <p><strong>Patient Name:</strong> {{appoint.patient.user.full_name|title}}</p>
@@ -102,51 +98,32 @@
                     </div>
                 </div>
 
-                <div class="col-lg-4 mx-auto">
-                    <div class="row">
-                        <div class="col-lg-6 mx-auto">
-                            <label for="Anorectal">Anorectal</label>
-                            <input type="radio" id="Anorectal">
-                        </div>
-                        <div class="col-lg-6 mx-auto">
-                            <label for="General">General</label>
-                            <input type="radio" id="General">
-                        </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <label for="complaint"><b>P/R</b></label>
+                        <textarea name="complaint" id="complaint" cols="30" rows="1"
+                                  class="form-control mb-1"></textarea>
+                    </div>
+                    <div class="col-lg-6">
+                        <label for="disease"><b>Proctoscopy</b></label>
+                        <textarea name="disease" id="disease" cols="30" rows="1" class="form-control mb-1"></textarea>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-lg-4">
-                        <label for="complaint"><b>AGNI</b></label>
-                        <select name="" id="" class="form-control">
-                            <option value="">option 1</option>
-                            <option value="">option 2</option>
-                            <option value="">option 3</option>
-                        </select>
+                    <div class="col-lg-6">
+                        <label for="complaint"><b>Probing</b></label>
+                        <textarea name="complaint" id="complaint" cols="30" rows="1"
+                                  class="form-control mb-1"></textarea>
                     </div>
-
-                    <div class="col-lg-4">
-                        <label for="disease"><b>NIDRA</b></label>
-                        <select name="" id="" class="form-control">
-                            <option value="">option 1</option>
-                            <option value="">option 2</option>
-                            <option value="">option 3</option>
-                        </select>
-                    </div>
-
-                    <div class="col-lg-4">
-                        <label for="complaint"><b>BALA</b></label>
-                        <select name="" id="" class="form-control">
-                            <option value="">option 1</option>
-                            <option value="">option 2</option>
-                            <option value="">option 3</option>
-                        </select>
+                    <div class="col-lg-6">
+                        <label for="disease"><b>O/E</b></label>
+                        <textarea name="disease" id="disease" cols="30" rows="1" class="form-control mb-1"></textarea>
                     </div>
                 </div>
 
-
                 <div class="row">
-                    <div class="col-lg-3">
-                        <label for="">NADI</label>
+                    <div class="col-lg-2">
+                        <label for="">Diagnosis</label>
                         <select name="" id="" class="form-control">
                             <option value="">option 1</option>
                             <option value="">option 2</option>
@@ -154,8 +131,8 @@
                         </select>
                     </div>
 
-                    <div class="col-lg-3">
-                        <label for="">MALA</label>
+                    <div class="col-lg-2">
+                        <label for="">Type</label>
                         <select name="" id="" class="form-control">
                             <option value="">option 1</option>
                             <option value="">option 2</option>
@@ -163,8 +140,8 @@
                         </select>
                     </div>
 
-                    <div class="col-lg-3">
-                        <label for="">MUTRA</label>
+                    <div class="col-lg-2">
+                        <label for="">Position</label>
                         <select name="" id="" class="form-control">
                             <option value="">option 1</option>
                             <option value="">option 2</option>
@@ -172,30 +149,37 @@
                         </select>
                     </div>
 
-                    <div class="col-lg-3">
-                        <label for="">ADVICE</label>
-                        <select name="" id="" class="form-control">
-                            <option value="">option 1</option>
-                            <option value="">option 2</option>
-                            <option value="">option 3</option>
-                        </select>
-                    </div>
-                </div>
-
-
-                <div class="row">
                     <div class="col-lg-4">
-                        <label for="">DIAGNOSIS</label>
                         <textarea name="" id="" cols="30" rows="2" class="w-100"></textarea>
+                    </div>
+
+                    <div class="col-lg-2">
+                        <button type="button" class="btn btn-primary">add</button>
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <div class="col-lg-4">
+                        <label for="">Bleeding</label>
+                        <select name="" id="" class="form-control">
+                            <option value="">option 1</option>
+                            <option value="">option 2</option>
+                            <option value="">option 3</option>
+                        </select>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <label for="">Advice</label>
+                        <select name="" id="" class="form-control">
+                            <option value="">option 1</option>
+                            <option value="">option 2</option>
+                            <option value="">option 3</option>
+                        </select>
                     </div>
 
                     <div class="col-lg-4">
                         <label for="">Review after</label>
-                        <textarea name="" id="" cols="30" rows="2" class="w-100"></textarea>
-                    </div>
-
-                    <div class="col-lg-4">
-                        <label for="">Remark</label>
                         <textarea name="" id="" cols="30" rows="2" class="w-100"></textarea>
                     </div>
                 </div>
@@ -213,6 +197,7 @@
                     </tbody>
                 </table>
             </form>
+
             <div class="d-flex mx-auto">
                 <div class="m-1">
                     <button class="btn btn-success" id="submitForm">Save</button>
@@ -220,16 +205,6 @@
                 <div class="m-1">
                     <a href="/patient_report/history/{{appoint.patient_appoint_id}}/" target="_blank"
                        class="btn btn-primary">History</a>
-                </div>
-
-                <div class="m-1">
-                    <a href="/patient_report/history/{{appoint.patient_appoint_id}}/" target="_blank"
-                       class="btn btn-primary">Move to IPD</a>
-                </div>
-
-                <div class="m-1">
-                    <a href="/patient_report/history/{{appoint.patient_appoint_id}}/" target="_blank"
-                       class="btn btn-primary">Move to Panchkarma Therapy</a>
                 </div>
 
                 <div class="m-1">
@@ -314,10 +289,6 @@
     }
 
 
-
-
-
-
 </script>
 
 <script>
@@ -341,10 +312,6 @@ $(document).ready(function() {
         });
     });
 });
-
-
-
-
 
 
 </script>
